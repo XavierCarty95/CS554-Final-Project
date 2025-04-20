@@ -9,6 +9,9 @@ import Dashboard from "./components/Dashboard";
 import ForumPage from "./components/Forum/ForumPage";
 import ForumThread from "./components/Forum/ForumThread";
 import NewThreadForm from "./components/Forum/NewThreadForm";
+import About from "./components/About";
+import Privacy from "./components/Privacy";
+import Contact from "./components/Contact";
 
 function App() {
   return (
@@ -42,6 +45,9 @@ function App() {
           path="/university/:universityId/forum/new"
           element={<NewThreadForm />}
         />
+        <Route path="/about" element={<About />} />
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/contact" element={<Contact />} />
       </Routes>
     </div>
   );
