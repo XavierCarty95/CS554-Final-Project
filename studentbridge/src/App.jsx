@@ -26,13 +26,7 @@ function App() {
           Forum
         </NavLink>
         <NavLink className="navlink" to="/login">
-          Login
-        </NavLink>
-        <NavLink className="navlink" to="/signup">
-          Signup
-        </NavLink>
-        <NavLink className="navlink" to="/university">
-          Universities
+          login
         </NavLink>
         <NavLink className="navlink" to="/university">
           Universities
