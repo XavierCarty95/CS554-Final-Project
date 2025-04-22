@@ -11,6 +11,9 @@ import ForumThread from "./components/Forum/ForumThread";
 import NewThreadForm from "./components/Forum/NewThreadForm";
 import UniversitySelection from "./components/University/UniversitySelection";
 import UniversityProfile from "./components/University/UniversityProfile";
+import About from "./components/About";
+import Privacy from "./components/Privacy";
+import Contact from "./components/Contact";
 import ThreadDetailPage from "./components/Forum/ThreadDetailPage";
 
 function App() {
@@ -58,6 +61,9 @@ function App() {
           path="/university/:universityId/forums/new"
           element={<NewThreadForm />}
         /> */}
+        <Route path="/about" element={<About />} />
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/contact" element={<Contact />} />
       </Routes>
     </div>
   );
