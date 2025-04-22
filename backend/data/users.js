@@ -25,7 +25,7 @@ export const createUser = async (email, password, name, role, universityId) => {
   name = strCheck(name, "name");
   validateName(name);
   email = strCheck(email, "email");
-  // validateemail(email);
+
   email = email.toLowerCase();
   password = strCheck(password, "password");
   validatePassword(password);
@@ -44,9 +44,12 @@ export const createUser = async (email, password, name, role, universityId) => {
       email,
       role,
       universityId,
+      profile: {},
+      groups: [],
     };
     let newUser = await userCollection.insertOne(user);
     if (!newUser.acknowledged) {
+      await userCredential.user.delete();
       throw new Error("Could not add user to database");
     }
     return { ...user, _id: newUser.insertedId.toString() };
@@ -64,23 +67,33 @@ export const createUser = async (email, password, name, role, universityId) => {
 
 export const loginUser = async (email, password) => {
   email = strCheck(email, "email");
-  // validateemail(email);
+
   email = email.toLowerCase();
   password = strCheck(password, "password");
 
   const auth = getAuth();
   let userCollection = await users();
-  let user;
+
   try {
     const userCredential = await signInWithEmailAndPassword(
       auth,
       email,
       password
     );
-    const userId = userCredential.user.uid;
-    user = await userCollection.findOne({ email });
+
+    console.log("User credential:", userCredential);
+
+    const user = await userCollection.findOne({
+      email: email,
+    });
+
+    if (!user) {
+      throw new Error("User not found in database");
+    }
+
+    return user;
   } catch (e) {
+    console.error("Login error:", e);
     return { signInCompleted: false };
   }
-  return user;
 };

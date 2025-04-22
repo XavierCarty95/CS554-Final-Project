@@ -3,18 +3,19 @@ import * as usersData from "../data/users.js";
 import { getAuth, signOut } from "firebase/auth";
 const router = express.Router();
 
-const ensureAuthenticated = (req, res, next) => {
-  if (req.session.user) {
-    return res.status(200).json({ message: "User is authenticated" });
-  } else {
-    next();
+const ensureAuthenticated = async (req, res, next) => {
+  if (!req.session.user) {
+    return res.status(401).json({ error: "Authentication required" });
   }
+  next(); // This should be outside the if block
 };
 
-router.post("/login", ensureAuthenticated, async (req, res) => {
+router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
+
     let user = await usersData.loginUser(email, password);
+
     if (user.signInCompleted === false) {
       return res
         .status(400)
@@ -27,15 +28,20 @@ router.post("/login", ensureAuthenticated, async (req, res) => {
         universityId: user.universityId,
       };
     }
-    return res
-      .status(200)
-      .send({ email: user.email, name: user.name, _id: user._id, role: user.role, universityId: user.universityId });
+
+    return res.status(200).send({
+      email: user.email,
+      name: user.name,
+      _id: user._id,
+      role: user.role,
+      universityId: user.universityId,
+    });
   } catch (e) {
     return res.status(400).json({ error: e.message });
   }
 });
 
-router.post("/signup", ensureAuthenticated, async (req, res) => {
+router.post("/signup", async (req, res) => {
   try {
     const { email, name, password, role, universityId } = req.body;
     let users = await usersData.createUser(
@@ -51,6 +57,7 @@ router.post("/signup", ensureAuthenticated, async (req, res) => {
       role: users.role,
       universityId: users.universityId,
     };
+
     return res.status(200).send(users);
   } catch (e) {
     return res.status(400).json({ error: e.message });
