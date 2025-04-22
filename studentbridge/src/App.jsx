@@ -11,6 +11,7 @@ import ForumThread from "./components/Forum/ForumThread";
 import NewThreadForm from "./components/Forum/NewThreadForm";
 import UniversitySelection from "./components/University/UniversitySelection";
 import UniversityProfile from "./components/University/UniversityProfile";
+import ThreadDetailPage from "./components/Forum/ThreadDetailPage";
 
 function App() {
   return (
@@ -46,13 +47,17 @@ function App() {
           element={<ForumPage />}
         />
         <Route
+          path="/university/:universityId/forums/:forumId"
+          element={<ThreadDetailPage />}
+        />
+        {/* <Route
           path="/university/:universityId/forums/:id"
           element={<ForumThread />}
-        />
-        <Route
+        /> */}
+        {/* <Route
           path="/university/:universityId/forums/new"
           element={<NewThreadForm />}
-        />
+        /> */}
       </Routes>
     </div>
   );

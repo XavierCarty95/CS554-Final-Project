@@ -16,7 +16,6 @@ router.get("/", ensureAuthenticated, async (req, res) => {
   try {
     const { universityId } = req.params;
 
-
     if (!universityId || typeof universityId !== "string") {
       return res.status(400).json({ error: "Invalid university ID" });
     }
@@ -48,6 +47,17 @@ router.post("/", ensureAuthenticated, async (req, res) => {
     return res
       .status(400)
       .json({ error: error.message || "Failed to create forum" });
+  }
+});
+
+router.get("/:forumId", async (req, res) => {
+  try {
+    const { forumId } = req.params;
+    const forum = await forumsData.getForumById(forumId);
+    return res.json(forum);
+  } catch (error) {
+    console.error("Error getting forum:", error);
+    return res.status(404).json({ error: "Forum not found" });
   }
 });
 

@@ -1,13 +1,10 @@
-import {forums} from "../config/mongoCollections.js";
+import { forums } from "../config/mongoCollections.js";
 import { ObjectId } from "mongodb";
 
 export const getForumsByUniversity = async (universityId) => {
-
-
   if (!universityId || typeof universityId !== "string") {
     throw new Error("Invalid university ID");
   }
-
 
   const forumsCollection = await forums();
 
@@ -26,6 +23,30 @@ export const getForumsByUniversity = async (universityId) => {
     .toArray();
 
   return forumList;
+};
+
+// In your forums.js data file, add this function
+export const getForumById = async (id) => {
+  if (!id || typeof id !== "string") {
+    throw new Error("Invalid forum ID");
+  }
+
+  const forumsCollection = await forums();
+
+  let forumIdObj;
+  try {
+    forumIdObj = ObjectId.isValid(id) ? new ObjectId(id) : id;
+  } catch (e) {
+    throw new Error("Invalid forum ID format");
+  }
+
+  const forum = await forumsCollection.findOne({ _id: forumIdObj });
+
+  if (!forum) {
+    throw new Error("Forum not found");
+  }
+
+  return forum;
 };
 
 export const createForum = async (universityId, title, tags, createdBy) => {

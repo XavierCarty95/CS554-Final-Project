@@ -24,6 +24,18 @@ export async function getPosts(forumId, universityId) {
   }
 }
 
+export async function getForumById(forumId, universityId) {
+  try {
+    const response = await axios.get(
+      `${BASE_URL}/${universityId}/forums/${forumId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching forum details:", error);
+    throw error;
+  }
+}
+
 export async function createForum({ title, universityId, tags }) {
   try {
     const response = await axios.post(`${BASE_URL}/${universityId}/forums`, {

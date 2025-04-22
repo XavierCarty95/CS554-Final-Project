@@ -81,7 +81,7 @@ export const loginUser = async (email, password) => {
       password
     );
 
-    console.log("User credential:", userCredential);
+    // console.log("User credential:", userCredential);
 
     const user = await userCollection.findOne({
       email: email,
