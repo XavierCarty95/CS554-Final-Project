@@ -14,6 +14,7 @@ import UniversityProfile from "./components/University/UniversityProfile";
 import About from "./components/About";
 import Privacy from "./components/Privacy";
 import Contact from "./components/Contact";
+import ThreadDetailPage from "./components/Forum/ThreadDetailPage";
 
 function App() {
   return (
@@ -49,13 +50,17 @@ function App() {
           element={<ForumPage />}
         />
         <Route
+          path="/university/:universityId/forums/:forumId"
+          element={<ThreadDetailPage />}
+        />
+        {/* <Route
           path="/university/:universityId/forums/:id"
           element={<ForumThread />}
-        />
-        <Route
+        /> */}
+        {/* <Route
           path="/university/:universityId/forums/new"
           element={<NewThreadForm />}
-        />
+        /> */}
         <Route path="/about" element={<About />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/contact" element={<Contact />} />
