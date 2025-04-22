@@ -9,6 +9,8 @@ import Dashboard from "./components/Dashboard";
 import ForumPage from "./components/Forum/ForumPage";
 import ForumThread from "./components/Forum/ForumThread";
 import NewThreadForm from "./components/Forum/NewThreadForm";
+import UniversitySelection from "./components/University/UniversitySelection";
+import UniversityProfile from "./components/University/UniversityProfile";
 import About from "./components/About";
 import Privacy from "./components/Privacy";
 import Contact from "./components/Contact";
@@ -20,7 +22,7 @@ function App() {
         <NavLink className="navlink" to="/">
           Home
         </NavLink>
-        <NavLink className="navlink" to="/university/:universityid/forum">
+        <NavLink className="navlink" to="/university/:universityid/forums">
           Forum
         </NavLink>
         <NavLink className="navlink" to="/login">
@@ -29,6 +31,12 @@ function App() {
         <NavLink className="navlink" to="/signup">
           Signup
         </NavLink>
+        <NavLink className="navlink" to="/university">
+          Universities
+        </NavLink>
+        <NavLink className="navlink" to="/university">
+          Universities
+        </NavLink>
       </nav>
 
       <Routes>
@@ -36,13 +44,22 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/university/:universityId/forum" element={<ForumPage />} />
+
+        <Route path="/university" element={<UniversitySelection />} />
         <Route
-          path="/university/:universityId/forum/:id"
+          path="/university/:universityId"
+          element={<UniversityProfile />}
+        />
+        <Route
+          path="/university/:universityId/forums"
+          element={<ForumPage />}
+        />
+        <Route
+          path="/university/:universityId/forums/:id"
           element={<ForumThread />}
         />
         <Route
-          path="/university/:universityId/forum/new"
+          path="/university/:universityId/forums/new"
           element={<NewThreadForm />}
         />
         <Route path="/about" element={<About />} />

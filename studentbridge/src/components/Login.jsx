@@ -7,16 +7,15 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const Navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!/\S+@\S+\.\S+/.test(email)) {
       alert("Please enter a valid email address.");
       return;
     }
-    axios
+    await axios
       .post("/login", { email, password })
-      .then((response) => {
-        console.log("Login successful:", response.data);
+      .then(() => {
         alert("Login successful! Redirecting to dashboard...");
         Navigate("/dashboard", { replace: true });
       })

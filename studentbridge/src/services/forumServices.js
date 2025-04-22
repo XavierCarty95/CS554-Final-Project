@@ -1,56 +1,68 @@
-let mockForums = [
-  {
-    _id: "forumId1",
-    title: "Best courses for CS majors?",
-    universityId: "uni123",
-    tags: ["CS", "advice"],
-    createdBy: "userId1",
-    createdAt: "2025-04-17T10:00:00Z",
-  },
-];
+import axios from "../config/axiosConfig";
 
-let mockPosts = [
-  {
-    _id: "postId1",
-    forumId: "forumId1",
-    authorId: "userId2",
-    content: "I recommend ...",
-    createdAt: "2025-04-17T11:00:00Z",
-    votes: [{ userId: "userId3", type: "upvote" }],
-  },
-];
+const BASE_URL = "/university";
 
 export async function getForums(universityId) {
-  return mockForums.filter((f) => f.universityId === universityId);
+  try {
+    const response = await axios.get(`${BASE_URL}/${universityId}/forums`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching forums:", error);
+    throw error;
+  }
 }
 
-export async function getPosts(forumId) {
-  return mockPosts.filter((p) => p.forumId === forumId);
+export async function getPosts(forumId, universityId) {
+  try {
+    const response = await axios.get(
+      `${BASE_URL}/${universityId}/forums/${forumId}/posts`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching posts:", error);
+    throw error;
+  }
 }
 
-export async function createForum({ title, universityId, tags, createdBy }) {
-  const newForum = {
-    _id: "forumId" + Date.now(),
-    title,
-    universityId,
-    tags,
-    createdBy,
-    createdAt: new Date().toISOString(),
-  };
-  mockForums.unshift(newForum);
-  return newForum;
+export async function createForum({ title, universityId, tags }) {
+  try {
+    const response = await axios.post(`${BASE_URL}/${universityId}/forums`, {
+      title,
+      tags,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error creating forum:", error);
+    throw error;
+  }
 }
 
-export async function createPost({ forumId, authorId, content }) {
+export async function createPost({ forumId, content, universityId }) {
+  try {
+    const response = await axios.post(
+      `${BASE_URL}/${universityId}/forums/${forumId}/posts`,
+      {
+        content,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error creating post:", error);
+    throw error;
+  }
+}
 
-  const newPost = {
-    _id: "postId" + Date.now(),
-    forumId,
-    authorId,
-    content,
-    createdAt: new Date().toISOString(),
-    votes: [],
-  };
-  mockPosts.push(newPost);
-  return newPost;
+export async function votePost(postId, voteType, universityId) {
+  try {
+    const response = await axios.post(
+      `${BASE_URL}/${universityId}/forums/posts/${postId}/vote`,
+      {
+        voteType,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error voting on post:", error);
+    throw error;
+  }
 }
