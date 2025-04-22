@@ -7,8 +7,8 @@ import Login from "./components/Login";
 import Signup from "./components/Signup";
 import Dashboard from "./components/Dashboard";
 import ForumPage from "./components/Forum/ForumPage";
-import ForumThread from "./components/Forum/ForumThread";
-import NewThreadForm from "./components/Forum/NewThreadForm";
+// import ForumThread from "./components/Forum/ForumThread";
+// import NewThreadForm from "./components/Forum/NewThreadForm";
 import UniversitySelection from "./components/University/UniversitySelection";
 import UniversityProfile from "./components/University/UniversityProfile";
 import About from "./components/About";
@@ -23,9 +23,9 @@ function App() {
         <NavLink className="navlink" to="/">
           Home
         </NavLink>
-        <NavLink className="navlink" to="/university/:universityid/forums">
+        {/* <NavLink className="navlink" to="/university/:universityid/forums">
           Forum
-        </NavLink>
+        </NavLink> */}
         <NavLink className="navlink" to="/login">
           login
         </NavLink>
