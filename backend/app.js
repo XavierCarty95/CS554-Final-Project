@@ -12,7 +12,11 @@ app.use(
     secret: "SecretCookie",
     resave: false,
     saveUninitialized: false,
-    cookie: { maxAge: 600000 },
+    cookie: {
+      maxAge: 600_000, // 10 min
+      sameSite: "lax", // ok if you stay on http for dev
+      // sameSite:"none", secure:true would be needed on HTTPS
+    },
   })
 );
 app.use(express.json());
