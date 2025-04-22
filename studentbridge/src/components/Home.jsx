@@ -1,7 +1,7 @@
 import React from "react";
 import SearchBar from "./SearchBar";
 import { NavLink } from "react-router-dom";
-import { University, MessageCircle, Calendar } from "lucide-react";
+import { University, MessageCircle, Calendar, Star } from "lucide-react";
 
 const features = [
   {
@@ -15,10 +15,10 @@ const features = [
     icon: <MessageCircle size={48} className="text-blue-500 mb-4" />,
   },
   {
-    title: "Events & Resources",
+    title: "Explore and manage ratings and reviews",
     description:
       "Discover student-run events, study materials, and mentorship opportunities.",
-    icon: <Calendar size={48} className="text-blue-500 mb-4" />,
+    icon: <Star size={48} className="text-blue-500 mb-4" />,
   },
 ];
 
