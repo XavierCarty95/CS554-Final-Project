@@ -1,12 +1,21 @@
 import React, { useState } from "react";
+import axios from "../config/axiosConfig";
 
 export default function Contact() {
   const [message, setMessage] = useState("");
-  const handleSubmit = (e) => {
+  const [status, setStatus] = useState(null);
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: hook up to your backend or service
-    alert("Thanks for reaching out!");
-    setMessage("");
+    setStatus("sending");
+
+    try {
+      await axios.post("/contact", { message });
+      setStatus("success");
+      setMessage("");
+    } catch (err) {
+      console.error("Contact form error:", err);
+      setStatus("error");
+    }
   };
 
   return (
@@ -20,12 +29,23 @@ export default function Contact() {
           onChange={(e) => setMessage(e.target.value)}
           required
         />
+
         <button
           type="submit"
-          className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+          className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition disabled:opacity-50"
+          disabled={status === "sending"}
         >
-          Send Message
+          {status === "sending" ? "Sending…" : "Send Message"}
         </button>
+
+        {status === "success" && (
+          <p className="mt-4 text-green-600">Message sent successfully!</p>
+        )}
+        {status === "error" && (
+          <p className="mt-4 text-red-600">
+            Something went wrong. Please try again later.
+          </p>
+        )}
       </form>
     </div>
   );
