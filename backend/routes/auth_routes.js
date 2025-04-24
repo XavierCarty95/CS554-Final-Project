@@ -80,4 +80,11 @@ router.get("/logout", (req, res) => {
   });
 });
 
+router.get("/verify", ensureAuthenticated, (req, res) => {
+  if (!req.session.user) {
+    return res.status(401).json({ error: "Authentication required" });
+  }
+  return res.status(200).send(req.session.user);
+});
+
 export default router;

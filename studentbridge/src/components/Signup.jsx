@@ -7,18 +7,32 @@ function Signup() {
     name: "",
     email: "",
     password: "",
+    confirmPassword: "",
     role: "student",
     university: "",
   });
+  const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+    setErrorMessage("");
+  };
+
+  const validatePasswords = () => {
+    if (formData.password !== formData.confirmPassword) {
+      setErrorMessage("Passwords do not match!"); 
+      return false;
+    }
+    return true;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!validatePasswords()) {
+      return;
+    }
     const user = {
       name: formData.name,
       email: formData.email,
@@ -36,7 +50,7 @@ function Signup() {
       })
       .catch((error) => {
         console.error("Signup failed:", error.response?.data || error.message);
-        alert("Signup failed. Please try again.");
+        setErrorMessage("Signup failed: " + error.response?.data.error);
       });
   };
 
@@ -91,6 +105,20 @@ function Signup() {
           </div>
           <div className="mb-4">
             <label className="block mb-2 text-sm font-medium text-gray-600">
+              Confirm Password
+            </label>
+            <input
+              type="password"
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              placeholder="Confirm your password"
+              required
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block mb-2 text-sm font-medium text-gray-600">
               Role
             </label>
             <select
@@ -125,6 +153,9 @@ function Signup() {
           >
             Signup
           </button>
+          {errorMessage && (
+            <div className="mb-4 text-sm text-red-600">{errorMessage}</div>
+          )}
         </form>
       </div>
     </div>

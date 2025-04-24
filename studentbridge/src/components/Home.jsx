@@ -16,8 +16,7 @@ const features = [
   },
   {
     title: "Explore and manage ratings and reviews",
-    description:
-      "Discover student-run events, study materials, and mentorship opportunities.",
+    description: "Discover students ratings nad reviews .",
     icon: <Star size={48} className="text-blue-500 mb-4" />,
   },
 ];
