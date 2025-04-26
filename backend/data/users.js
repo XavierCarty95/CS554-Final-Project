@@ -31,6 +31,18 @@ export const createUser = async (email, password, name, role, universityId) => {
   validatePassword(password);
   role = strCheck(role, "role");
 
+  if (role !== "student" && role !== "incoming" && role !== "professor") {
+    throw new Error("Role must be either student, incoming or professor");
+  }
+  if (role === "incoming") {
+    universityId = "";
+  } else {
+    universityId = strCheck(universityId, "universityId");
+    if (!ObjectId.isValid(universityId)) {
+      throw new Error("Invalid university ID");
+    }
+  }
+
   let userCollection = await users();
   try {
     const auth = getAuth();
