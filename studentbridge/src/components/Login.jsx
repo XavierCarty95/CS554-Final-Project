@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import axios from "../config/axiosConfig";
 
-const Login = () => {
+const Login = (props) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const Navigate = useNavigate();
@@ -17,6 +17,7 @@ const Login = () => {
       .post("/login", { email, password })
       .then(() => {
         alert("Login successful! Redirecting to dashboard...");
+        props.setIsLoggedIn(true);
         Navigate("/dashboard", { replace: true });
       })
       .catch((error) => {

@@ -14,6 +14,16 @@ router.get("/", async (req, res) => {
   }
 });
 
+//get university dropdown
+router.get("/getUniversityDropdown", async (req, res) => {
+  try {
+    const universities = await universitiesData.getUniversityDropdown();
+    return res.json(universities);
+  } catch (e) {
+    return res.status(500).json({ error: e.message });
+  }
+});
+
 // Get university by ID
 router.get("/:id", async (req, res) => {
   try {
