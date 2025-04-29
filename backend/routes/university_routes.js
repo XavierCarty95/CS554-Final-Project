@@ -4,7 +4,7 @@ import * as universitiesData from "../data/universities.js";
 
 const router = express.Router();
 
-// Get all universities
+
 router.get("/", async (req, res) => {
   try {
     const universities = await universitiesData.getAllUniversities();
@@ -14,7 +14,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-// Get university by ID
+
 router.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
