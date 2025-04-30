@@ -4,7 +4,7 @@ import * as universitiesData from "../data/universities.js";
 
 const router = express.Router();
 
-// Get all universities
+
 router.get("/", async (req, res) => {
   try {
     const universities = await universitiesData.getAllUniversities();

@@ -35,6 +35,7 @@ function Search() {
           type: "professor",
         }));
         setSuggestions([...uniSuggestions, ...profSuggestions]);
+        // eslint-disable-next-line no-unused-vars
       } catch (err) {
         setError("Failed to load suggestions.");
       } finally {
