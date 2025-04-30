@@ -58,6 +58,7 @@ function Signup(props) {
 
     axios
       .post("/signup", user)
+      // eslint-disable-next-line no-unused-vars
       .then((response) => {
         alert("Signup successful! Redirecting to login page...");
         props.setIsLoggedIn(true);

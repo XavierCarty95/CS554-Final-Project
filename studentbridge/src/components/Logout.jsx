@@ -11,6 +11,7 @@ function Logout(props) {
       }
       props.setIsLoggedIn(false);
       return true;
+    // eslint-disable-next-line no-unused-vars
     } catch (error) {
       return false;
     }
