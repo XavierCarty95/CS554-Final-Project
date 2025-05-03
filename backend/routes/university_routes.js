@@ -24,7 +24,6 @@ router.get("/getUniversityDropdown", async (req, res) => {
   }
 });
 
-// Get university by ID
 router.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;

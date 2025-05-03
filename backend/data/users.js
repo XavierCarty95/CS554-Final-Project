@@ -109,3 +109,22 @@ export const loginUser = async (email, password) => {
     return { signInCompleted: false };
   }
 };
+
+export const getUserById = async (userId) => {
+  userId = strCheck(userId, "userId");
+  if (!ObjectId.isValid(new ObjectId(userId))) {
+    throw new Error("Invalid user ID");
+  }
+  console.log("Fetching user with ID:", userId);
+
+  let userCollection = await users();
+  const user = await userCollection.findOne({
+    _id: new ObjectId(userId),
+  });
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  return { ...user, _id: user._id.toString() };
+};

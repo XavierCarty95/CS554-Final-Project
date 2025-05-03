@@ -1,9 +1,24 @@
 // src/components/Forum/ForumPost.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { votePost } from "../../services/forumServices";
+import { Link } from "react-router-dom";
+import { getUserById } from "../../services/userServices"; // You should have this
 
 export default function ForumPost({ post, universityId }) {
   const [votes, setVotes] = useState(post.votes || []);
+  const [authorName, setAuthorName] = useState("");
+
+  // Fetch author name if not included in post
+  useEffect(() => {
+    if (post.authorName) {
+      setAuthorName(post.authorName);
+    } else {
+      // Fetch from backend
+      getUserById(post.authorId)
+        .then((user) => setAuthorName(user.name))
+        .catch(() => setAuthorName("Unknown User"));
+    }
+  }, [post.authorId, post.authorName]);
 
   const handleVote = async (voteType) => {
     try {
@@ -42,7 +57,16 @@ export default function ForumPost({ post, universityId }) {
             ▼
           </button>
         </div>
-        <div>Posted on {new Date(post.createdAt).toLocaleDateString()}</div>
+        <div>
+          Posted by{" "}
+          <Link
+            to={`/profile/${post.authorId}`}
+            className="text-blue-600 hover:underline"
+          >
+            {authorName}
+          </Link>{" "}
+          on {new Date(post.createdAt).toLocaleDateString()}
+        </div>
       </div>
     </div>
   );

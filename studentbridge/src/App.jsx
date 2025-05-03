@@ -1,15 +1,12 @@
 import { NavLink, Routes, Route } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 import "./tailwind.css";
-import "./App.css";
 import Home from "./components/Home";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
 import Dashboard from "./components/Dashboard";
 import ForumPage from "./components/Forum/ForumPage";
-// import ForumThread from "./components/Forum/ForumThread";
-// import NewThreadForm from "./components/Forum/NewThreadForm";
 import UniversitySelection from "./components/University/UniversitySelection";
 import UniversityProfile from "./components/University/UniversityProfile";
 import About from "./components/About";
@@ -18,11 +15,12 @@ import Contact from "./components/Contact";
 import ThreadDetailPage from "./components/Forum/ThreadDetailPage";
 import Logout from "./components/Logout";
 import axiosInstance from "./config/axiosConfig";
-import { useState } from "react";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Profile from "./components/Profile/ProfilePage";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
     const verifyLogin = async () => {
@@ -32,18 +30,22 @@ function App() {
           .then((response) => {
             if (response.status === 200) {
               setIsLoggedIn(true);
+              setCurrentUser(response.data); // store user info
             }
           })
+          // eslint-disable-next-line no-unused-vars
           .catch((error) => {
             setIsLoggedIn(false);
+            setCurrentUser(null);
           });
+        // eslint-disable-next-line no-unused-vars
       } catch (error) {
-        console.error("Error verifying login:", error);
         setIsLoggedIn(false);
+        setCurrentUser(null);
       }
     };
     verifyLogin();
-  }, []);
+  }, [currentUser, isLoggedIn]);
 
   return (
     <div className="App">
@@ -51,29 +53,26 @@ function App() {
         <NavLink className="navlink" to="/">
           Home
         </NavLink>
-        {/* <NavLink className="navlink" to="/university/:universityid/forums">
-          Forum
-        </NavLink> */}
         {!isLoggedIn && (
           <div className="navlink-container">
             <NavLink className="navlink" to="/login">
               Login
             </NavLink>
-
             <NavLink className="navlink" to="/signup">
               Sign Up
             </NavLink>
           </div>
         )}
-
-        {isLoggedIn && (
+        {isLoggedIn && currentUser && (
           <div className="navlink-container">
             <NavLink className="navlink" to="/university">
               Universities
             </NavLink>
-
             <NavLink className="navlink" to="/logout">
               Logout
+            </NavLink>
+            <NavLink className="navlink" to={`/profile/${currentUser._id}`}>
+              Profile
             </NavLink>
           </div>
         )}
@@ -83,11 +82,21 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route
           path="/login"
-          element={<Login setIsLoggedIn={setIsLoggedIn} />}
+          element={
+            <Login
+              setIsLoggedIn={setIsLoggedIn}
+              setCurrentUser={setCurrentUser}
+            />
+          }
         />
         <Route
           path="/signup"
-          element={<Signup setIsLoggedIn={setIsLoggedIn} />}
+          element={
+            <Signup
+              setIsLoggedIn={setIsLoggedIn}
+              setCurrentUser={setCurrentUser}
+            />
+          }
         />
         <Route
           path="/dashboard"
@@ -97,7 +106,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         <Route path="/university" element={<UniversitySelection />} />
         <Route
           path="/university/:universityId"
@@ -111,21 +119,19 @@ function App() {
           path="/university/:universityId/forums/:forumId"
           element={<ThreadDetailPage />}
         />
-        {/* <Route
-          path="/university/:universityId/forums/:id"
-          element={<ForumThread />}
-        /> */}
-        {/* <Route
-          path="/university/:universityId/forums/new"
-          element={<NewThreadForm />}
-        /> */}
         <Route path="/about" element={<About />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/contact" element={<Contact />} />
         <Route
           path="/logout"
-          element={<Logout setIsLoggedIn={setIsLoggedIn} />}
+          element={
+            <Logout
+              setIsLoggedIn={setIsLoggedIn}
+              setCurrentUser={setCurrentUser}
+            />
+          }
         />
+        <Route path="/profile/:userId" element={<Profile />} />
       </Routes>
     </div>
   );

@@ -1,5 +1,7 @@
+// data/posts.js
 import { ObjectId } from "mongodb";
-import { posts, forums } from "../config/mongoCollections.js";
+import { posts, forums, users } from "../config/mongoCollections.js";
+import { getRedisClient } from "../config/connectRedis.js";
 
 export const getPostsByForum = async (forumId) => {
   if (!forumId || typeof forumId !== "string") {
@@ -7,6 +9,19 @@ export const getPostsByForum = async (forumId) => {
   }
 
   forumId = forumId.trim();
+
+  try {
+    const redisClient = getRedisClient();
+    const cacheKey = `posts:forum:${forumId}`;
+
+    const cachedData = await redisClient.get(cacheKey);
+    if (cachedData) {
+      console.log("Posts fetched from cache for forum:", forumId);
+      return JSON.parse(cachedData);
+    }
+  } catch (error) {
+    console.error("Redis error in getPostsByForum:", error);
+  }
 
   let forumIdObj;
   try {
@@ -20,6 +35,21 @@ export const getPostsByForum = async (forumId) => {
     .find({ forumId: forumIdObj })
     .sort({ createdAt: -1 })
     .toArray();
+
+  const userCollection = await users();
+  for (const post of postList) {
+    const author = await userCollection.findOne({ _id: post.authorId });
+    post.authorName = author ? author.name : "Unknown User";
+  }
+
+  try {
+    const redisClient = getRedisClient();
+    const cacheKey = `posts:forum:${forumId}`;
+    await redisClient.setEx(cacheKey, 300, JSON.stringify(postList)); 
+    console.log("Posts cached for forum:", forumId);
+  } catch (error) {
+    console.error("Redis caching error:", error);
+  }
 
   return postList;
 };
@@ -75,6 +105,14 @@ export const createPost = async (forumId, authorId, content) => {
     throw new Error("Could not create post");
   }
 
+  try {
+    const redisClient = getRedisClient();
+    await redisClient.del(`posts:forum:${forumId}`);
+    console.log("Forum posts cache invalidated for:", forumId);
+  } catch (error) {
+    console.error("Redis cache invalidation error:", error);
+  }
+
   return { ...newPost, _id: result.insertedId.toString() };
 };
 
@@ -106,13 +144,23 @@ export const votePost = async (postId, userId, voteType) => {
   }
 
   const updatedVotes = post.votes.filter((vote) => vote.userId !== userId);
-
   updatedVotes.push({ userId, type: voteType });
 
   await postsCollection.updateOne(
     { _id: postIdObj },
     { $set: { votes: updatedVotes } }
   );
+
+  try {
+    const redisClient = getRedisClient();
+    await redisClient.del(`posts:forum:${post.forumId}`);
+    console.log(
+      "Forum posts cache invalidated after vote for forum:",
+      post.forumId
+    );
+  } catch (error) {
+    console.error("Redis cache invalidation error:", error);
+  }
 
   return await postsCollection.findOne({ _id: postIdObj });
 };
