@@ -45,35 +45,35 @@ async function main() {
       console.log(`Added university: ${uniData.name}`);
     }
 
-    // Create users using the createUser function
-    console.log("Creating users...");
-    const userData = [
-      {
-        name: "Alice Johnson",
-        email: "alice2@example.com",
-        password: "Password123!",
-        role: "student",
-        universityId: universityIds[0].toString(),
-      },
-      // Add more users...
-    ];
+    // // Create users using the createUser function
+    // console.log("Creating users...");
+    // const userData = [
+    //   {
+    //     name: "Alice Johnson",
+    //     email: "alice2@example.com",
+    //     password: "Password123!",
+    //     role: "student",
+    //     universityId: universityIds[0].toString(),
+    //   },
+    //   // Add more users...
+    // ];
 
-    const userIds = [];
-    for (const user of userData) {
-      try {
-        const newUser = await createUser(
-          user.email,
-          user.password,
-          user.name,
-          user.role,
-          user.universityId
-        );
-        userIds.push(newUser._id);
-        console.log(`Added user: ${user.name}`);
-      } catch (e) {
-        console.error(`Failed to add user ${user.name}: ${e.message}`);
-      }
-    }
+    // const userIds = [];
+    // for (const user of userData) {
+    //   try {
+    //     const newUser = await createUser(
+    //       user.email,
+    //       user.password,
+    //       user.name,
+    //       user.role,
+    //       user.universityId
+    //     );
+    //     userIds.push(newUser._id);
+    //     console.log(`Added user: ${user.name}`);
+    //   } catch (e) {
+    //     console.error(`Failed to add user ${user.name}: ${e.message}`);
+    //   }
+    // }
 
     // Continue with creating forums and posts...
     // (rest of your seed code)
