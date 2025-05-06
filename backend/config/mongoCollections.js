@@ -18,3 +18,7 @@ export const forums = getCollectionFn("forums");
 export const universities = getCollectionFn("universities");
 export const posts = getCollectionFn("posts");
 export const chatRequests = getCollectionFn("chatRequests");
+
+export const professorReviews = getCollectionFn("professorReviews");
+export const professors = getCollectionFn("professors");
+export const reviews = getCollectionFn("reviews");

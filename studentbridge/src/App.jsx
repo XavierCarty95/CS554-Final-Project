@@ -11,11 +11,14 @@ import UniversitySelection from "./components/University/UniversitySelection";
 import UniversityProfile from "./components/University/UniversityProfile";
 import About from "./components/About";
 import Privacy from "./components/Privacy";
+
+import ProfessorsPage from "./components/Professor/ProfessorsPage";
 import Contact from "./components/Contact";
 import ThreadDetailPage from "./components/Forum/ThreadDetailPage";
 import Logout from "./components/Logout";
 import axiosInstance from "./config/axiosConfig";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ProfessorDetailPage from "./components/Professor/ProfessorDetail";
 import Profile from "./components/Profile/ProfilePage";
 
 function App() {
@@ -111,6 +114,11 @@ function App() {
           path="/university/:universityId"
           element={<UniversityProfile />}
         />
+        <Route
+  path="/university/:universityId/professors"
+  element={<ProfessorsPage />}
+/>
+<Route path="/university/:universityId/professors/:professorId" element={<ProfessorDetailPage />} />
         <Route
           path="/university/:universityId/forums"
           element={<ForumPage />}

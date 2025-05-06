@@ -65,6 +65,7 @@ function Signup(props) {
         navigate("/dashboard", { replace: true });
       })
       .catch((error) => {
+        console.log(error.response)
         console.error("Signup failed:", error.response?.data || error.message);
         setErrorMessage("Signup failed: " + error.response?.data.error);
       });
