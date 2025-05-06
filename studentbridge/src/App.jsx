@@ -45,7 +45,7 @@ function App() {
       }
     };
     verifyLogin();
-  }, [currentUser, isLoggedIn]);
+  }, [isLoggedIn]);
 
   return (
     <div className="App">

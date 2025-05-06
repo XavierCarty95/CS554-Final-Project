@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getUserById } from "../../services/userServices";
 import axios from "../../config/axiosConfig";
+import RequestChat from "../chats/RequestChat.jsx";
 
 export default function ProfilePage() {
   const { userId } = useParams();
@@ -11,6 +12,8 @@ export default function ProfilePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [universityName, setUniversityName] = useState("");
+  const [showRequestChat, setShowRequestChat] = useState(false);
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
     setIsLoading(true);
@@ -19,7 +22,6 @@ export default function ProfilePage() {
         setProfileUser(data);
         setIsLoading(false);
       })
-      // eslint-disable-next-line no-unused-vars
       .catch((err) => {
         setError("User not found");
         setIsLoading(false);
@@ -81,9 +83,22 @@ export default function ProfilePage() {
                 Edit Profile
               </button>
             ) : (
-              <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
+              <button
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+                onClick={() => setShowRequestChat(true)}
+              >
                 Message
               </button>
+            )}
+            {showRequestChat && (
+              <RequestChat
+                senderId={currentUser._id}
+                receipentId={profileUser._id}
+                message={message}
+                setMessage={setMessage}
+                showRequestChat={showRequestChat}
+                onClose={() => setShowRequestChat(false)}
+              />
             )}
           </div>
         </div>
