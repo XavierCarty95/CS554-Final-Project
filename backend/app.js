@@ -5,11 +5,18 @@ import cookieParser from "cookie-parser";
 import firebaseAuth from "./config/firebase.js";
 import cors from "cors";
 import { connectRedis } from "./config/connectRedis.js";
+import { createServer } from "http";
+import { initializeSocket } from "./socket.js"; // Import the Socket.IO logic
+
 const app = express();
 
 connectRedis()
   .then(() => console.log("Redis initialized"))
   .catch((err) => console.error("Failed to initialize Redis:", err));
+
+  const httpServer = createServer(app);
+
+initializeSocket(httpServer);
 
 app.use(
   session({
