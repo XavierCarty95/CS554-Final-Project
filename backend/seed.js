@@ -22,7 +22,7 @@ async function main() {
 
     // Clear existing data
     console.log("Clearing existing collections...");
-    await usersCollection.deleteMany({});
+    // await usersCollection.deleteMany({});
     await universitiesCollection.deleteMany({});
     await forumsCollection.deleteMany({});
     await postsCollection.deleteMany({});
