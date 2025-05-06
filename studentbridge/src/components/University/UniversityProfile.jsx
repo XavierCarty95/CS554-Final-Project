@@ -68,7 +68,12 @@ const UniversityProfile = () => {
             >
               Discussion Forums
             </button>
-            {/* Add more buttons for other university features */}
+            <button
+    onClick={() => navigate(`/university/${universityId}/professors`)}
+    className="w-full py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+  >
+    Rate My Professors
+  </button>
           </div>
         </div>
       </div>
