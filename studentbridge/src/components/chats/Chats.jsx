@@ -1,0 +1,217 @@
+import React, { useEffect, useState } from "react";
+import axios from "../../config/axiosConfig";
+import { NavLink } from "react-router-dom";
+export default function Chats() {
+  const [activeTab, setActiveTab] = useState(null);
+  const [chatRequests, setChatRequests] = useState([]);
+  const [personalChatsList, setPersonalChatsList] = useState([]);
+  const [groupsList, setGroupsList] = useState([]);
+  const [selectedChat, setSelectedChat] = useState(null);
+
+  const handleTabChange = (index) => {
+    setActiveTab(index);
+    if (index === 2) {
+      fetchChatRequests();
+    }
+    if (index === 0) {
+      fetchPersonalChats();
+    }
+  };
+
+  const fetchChatRequests = async () => {
+    try {
+      const response = await axios.get("/chat/getChatRequests");
+      if (response.status === 200) {
+        const chatRequestsData = response.data;
+        setChatRequests(chatRequestsData);
+      }
+    } catch (error) {
+      console.error("Error fetching chat requests:", error);
+    }
+  };
+
+  const fetchPersonalChats = async () => {
+    const response = await axios.get(`/chat/listPersonalChats`);
+    if (response.status === 200) {
+      const personalChatsData = response.data;
+      setPersonalChatsList(personalChatsData);
+    }
+  };
+
+  const handleAcceptRequest = async (requestId) => {
+    try {
+      const response = await axios.post("/chat/acceptChatRequest", {
+        requestId,
+      });
+      if (response.status === 200) {
+        setChatRequests((prevRequests) =>
+          prevRequests.filter((request) => request._id !== requestId)
+        );
+      }
+    } catch (error) {
+      console.error("Error accepting chat request:", error);
+    }
+  };
+
+  const handleRejectRequest = async (requestId) => {
+    try {
+      const response = await axios.post("/chat/rejectChatRequest", {
+        requestId,
+      });
+      if (response.status === 200) {
+        setChatRequests((prevRequests) =>
+          prevRequests.filter((request) => request._id !== requestId)
+        );
+      }
+    } catch (error) {
+      console.error("Error rejecting chat request:", error);
+    }
+  };
+
+  return (
+    <div className="flex h-screen bg-gray-100">
+      <div className="w-1/3 border-r overflow-y-auto bg-white shadow-md">
+        <div className="flex justify-center my-4">
+          <button
+            onClick={() => handleTabChange(0)}
+            className={`px-4 py-2 mx-2 rounded ${
+              activeTab === 0
+                ? "bg-blue-500 text-white shadow-lg"
+                : "bg-gray-300 text-black hover:bg-gray-400"
+            }`}
+          >
+            Personal Chats
+          </button>
+          <button
+            onClick={() => handleTabChange(1)}
+            className={`px-4 py-2 mx-2 rounded ${
+              activeTab === 1
+                ? "bg-blue-500 text-white shadow-lg"
+                : "bg-gray-300 text-black hover:bg-gray-400"
+            }`}
+          >
+            Groups
+          </button>
+          <button
+            onClick={() => handleTabChange(2)}
+            className={`px-4 py-2 mx-2 rounded ${
+              activeTab === 2
+                ? "bg-blue-500 text-white shadow-lg"
+                : "bg-gray-300 text-black hover:bg-gray-400"
+            }`}
+          >
+            Chat Requests
+          </button>
+        </div>
+        <div>
+          {activeTab === 0 && (
+            <div className="overflow-y-auto max-h-full">
+              {personalChatsList.length > 0 ? (
+                personalChatsList.map((chat) => (
+                  <div
+                    key={chat._id}
+                    className="border-b p-4 flex justify-between items-center hover:bg-gray-100 cursor-pointer"
+                    onClick={() => setSelectedChat(chat)}
+                  >
+                    <strong>
+                      {chat.name ||
+                        chat.members
+                          .filter((member) => member.name !== "You")
+                          .map((member) => member.name)
+                          .join(", ")}
+                    </strong>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center text-gray-500 py-4">
+                  No personal chats available.
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 1 && (
+            <div className="text-center text-gray-500 py-4">Groups Content</div>
+          )}
+
+          {activeTab === 2 && (
+            <div className="overflow-y-auto max-h-full">
+              {chatRequests.length > 0 ? (
+                chatRequests.map((request) => (
+                  <div
+                    key={request._id}
+                    className="border-b p-4 flex justify-between items-center hover:bg-gray-100"
+                  >
+                    <div>
+                      <NavLink
+                        to={`/profile/${request.senderId}`}
+                        className="text-blue-500 hover:underline"
+                      >
+                        <strong>{request.sender.name}</strong>
+                      </NavLink>
+                      : {request.message}
+                    </div>
+                    <div className="flex space-x-2">
+                      <button
+                        className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600"
+                        onClick={() => handleAcceptRequest(request._id)}
+                      >
+                        Accept
+                      </button>
+                      <button
+                        className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
+                        onClick={() => handleRejectRequest(request._id)}
+                      >
+                        Decline
+                      </button>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center text-gray-500 py-4">
+                  No chat requests available.
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="w-2/3 flex flex-col bg-white shadow-md">
+        {selectedChat ? (
+          <>
+            <div className="p-4 border-b"></div>
+            <h2 className="text-xl font-bold">
+              Chat with {selectedChat.name || "Unknown"}
+            </h2>
+
+            <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
+              {/* Placeholder for selected chat content */}
+              <p className="text-gray-500">Chat messages will appear here.</p>
+            </div>
+            <div className="p-4 border-t flex items-center space-x-2">
+              <input
+                type="text"
+                placeholder="Type a message..."
+                className="flex-1 border rounded px-4 py-2 focus:ring focus:ring-blue-300"
+              />
+              <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                Send
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="p-4 border-b">
+              <h2 className="text-xl font-bold">Chat Content</h2>
+            </div>
+            <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
+              {/* Placeholder for chat content */}
+              <p className="text-gray-500">Select a chat to view messages.</p>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}

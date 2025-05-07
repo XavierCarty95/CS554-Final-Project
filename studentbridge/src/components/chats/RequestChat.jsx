@@ -24,14 +24,19 @@ export default function RequestChat(props) {
       })
       .then((response) => {
         alert("Chat request sent successfully!");
-        setMessage(""); // Clear the input field after sending the request
+        setMessage("");
+        props.onClose();
       })
       .catch((error) => {
         console.error(
           "Error sending chat request:",
-          error.response?.data || error.message
+          error.response?.data.error || error.message
         );
-        alert("Failed to send chat request. Please try again.");
+        alert(
+          `Error sending chat request: ${
+            error.response?.data.error || error.message
+          }`
+        );
       });
   };
 
@@ -56,7 +61,7 @@ export default function RequestChat(props) {
         },
       }}
     >
-      <div className="bg-white bg-opacity-90 backdrop-filter backdrop-blur-md rounded-lg shadow-lg p-6 w-full max-w-md">
+      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
         <h2 className="text-xl font-semibold mb-4">Request a Chat</h2>
         <form
           id="requestChatForm"
