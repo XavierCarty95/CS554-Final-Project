@@ -2,6 +2,11 @@ import authRoutes from "./auth_routes.js";
 import forumRoutes from "./forum_routes.js";
 import universityRoutes from "./university_routes.js";
 import contactRoutes from "./contact_routes.js";
+
+import user_routes from "./user_routes.js";
+import professorRoutes from "./professors.js";
+import reviewsRoutes from "./reviews.js";
+import coursesRoutes from "./courses.js";
 import user_routes from "./user_routes.js";
 import professorRoutes from './professors.js';
 import reviewsRoutes from "./reviews.js";
@@ -13,6 +18,10 @@ const constructorMethod = (app) => {
   app.use("/universities", universityRoutes);
   app.use("/university/:universityId/forums", forumRoutes);
   app.use("/contact", contactRoutes);
+  app.use("/users", user_routes);
+  app.use("/professors", professorRoutes);
+  app.use("/reviews", reviewsRoutes);
+  app.use("/courses", coursesRoutes);
   app.use("/users", user_routes);
   app.use('/professors', professorRoutes);
   app.use("/reviews", reviewsRoutes)

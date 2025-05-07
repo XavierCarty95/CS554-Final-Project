@@ -20,3 +20,5 @@ export const posts = getCollectionFn("posts");
 export const professorReviews = getCollectionFn("professorReviews");
 export const professors = getCollectionFn("professors");
 export const reviews = getCollectionFn("reviews");
+export const courses = getCollectionFn("courses");
+

@@ -56,6 +56,15 @@ function App() {
         <NavLink className="navlink" to="/">
           Home
         </NavLink>
+        {/* <NavLink className="navlink" to="/university/:universityid/forums">
+          Forum
+        </NavLink> */}
+        <NavLink className="navlink" to="/login">
+          login
+        </NavLink>
+        <NavLink className="navlink" to="/university">
+          Universities
+        </NavLink>
         {!isLoggedIn && (
           <div className="navlink-container">
             <NavLink className="navlink" to="/login">
@@ -68,6 +77,18 @@ function App() {
         )}
         {isLoggedIn && currentUser && (
           <div className="navlink-container">
+            <NavLink className="navlink" to="/dashboard">
+              Dashboard
+            </NavLink>
+            <NavLink className="navlink" to="/university">
+              Universities
+            </NavLink>
+            <NavLink className="navlink" to={`/profile/${currentUser._id}`}>
+              Profile
+            </NavLink>
+            <NavLink className="navlink" to="/logout">
+              Logout
+            </NavLink>
             <NavLink className="navlink" to="/university">
               Universities
             </NavLink>
@@ -115,6 +136,13 @@ function App() {
           element={<UniversityProfile />}
         />
         <Route
+          path="/university/:universityId/professors"
+          element={<ProfessorsPage />}
+        />
+        <Route
+          path="/university/:universityId/professors/:professorId"
+          element={<ProfessorDetailPage />}
+        />
   path="/university/:universityId/professors"
   element={<ProfessorsPage />}
 />
