@@ -32,6 +32,32 @@ function App() {
         <NavLink className="navlink" to="/university">
           Universities
         </NavLink>
+        {!isLoggedIn && (
+          <div className="navlink-container">
+            <NavLink className="navlink" to="/login">
+              Login
+            </NavLink>
+            <NavLink className="navlink" to="/signup">
+              Sign Up
+            </NavLink>
+          </div>
+        )}
+        {isLoggedIn && currentUser && (
+          <div className="navlink-container">
+            <NavLink className="navlink" to="/dashboard">
+              Dashboard
+            </NavLink>
+            <NavLink className="navlink" to="/university">
+              Universities
+            </NavLink>
+            <NavLink className="navlink" to={`/profile/${currentUser._id}`}>
+              Profile
+            </NavLink>
+            <NavLink className="navlink" to="/logout">
+              Logout
+            </NavLink>
+          </div>
+        )}
       </nav>
 
       <Routes>
@@ -44,6 +70,14 @@ function App() {
         <Route
           path="/university/:universityId"
           element={<UniversityProfile />}
+        />
+        <Route
+          path="/university/:universityId/professors"
+          element={<ProfessorsPage />}
+        />
+        <Route
+          path="/university/:universityId/professors/:professorId"
+          element={<ProfessorDetailPage />}
         />
         <Route
           path="/university/:universityId/forums"
