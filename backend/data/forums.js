@@ -1,13 +1,27 @@
+// data/forums.js
 import { forums } from "../config/mongoCollections.js";
 import { ObjectId } from "mongodb";
+import { getRedisClient } from "../config/connectRedis.js";
 
 export const getForumsByUniversity = async (universityId) => {
   if (!universityId || typeof universityId !== "string") {
     throw new Error("Invalid university ID");
   }
 
-  const forumsCollection = await forums();
+  try {
+    const redisClient = getRedisClient();
+    const cacheKey = `forums:university:${universityId}`;
 
+    const cachedData = await redisClient.get(cacheKey);
+    if (cachedData) {
+      console.log("Forums fetched from cache for university:", universityId);
+      return JSON.parse(cachedData);
+    }
+  } catch (error) {
+    console.error("Redis error in getForumsByUniversity:", error);
+  }
+
+  const forumsCollection = await forums();
   let uniIdQuery;
   try {
     uniIdQuery = ObjectId.isValid(universityId)
@@ -22,17 +36,37 @@ export const getForumsByUniversity = async (universityId) => {
     .sort({ createdAt: -1 })
     .toArray();
 
+  try {
+    const redisClient = getRedisClient();
+    const cacheKey = `forums:university:${universityId}`;
+    await redisClient.setEx(cacheKey, 600, JSON.stringify(forumList)); // 10 minutes cache
+    console.log("Forums cached for university:", universityId);
+  } catch (error) {
+    console.error("Redis caching error:", error);
+  }
+
   return forumList;
 };
 
-// In your forums.js data file, add this function
 export const getForumById = async (id) => {
   if (!id || typeof id !== "string") {
     throw new Error("Invalid forum ID");
   }
 
-  const forumsCollection = await forums();
+  try {
+    const redisClient = getRedisClient();
+    const cacheKey = `forum:${id}`;
 
+    const cachedData = await redisClient.get(cacheKey);
+    if (cachedData) {
+      console.log("Forum fetched from cache:", id);
+      return JSON.parse(cachedData);
+    }
+  } catch (error) {
+    console.error("Redis error in getForumById:", error);
+  }
+
+  const forumsCollection = await forums();
   let forumIdObj;
   try {
     forumIdObj = ObjectId.isValid(id) ? new ObjectId(id) : id;
@@ -41,9 +75,17 @@ export const getForumById = async (id) => {
   }
 
   const forum = await forumsCollection.findOne({ _id: forumIdObj });
-
   if (!forum) {
     throw new Error("Forum not found");
+  }
+
+  try {
+    const redisClient = getRedisClient();
+    const cacheKey = `forum:${id}`;
+    await redisClient.setEx(cacheKey, 600, JSON.stringify(forum));
+    console.log("Forum cached:", id);
+  } catch (error) {
+    console.error("Redis caching error:", error);
   }
 
   return forum;
@@ -89,6 +131,14 @@ export const createForum = async (universityId, title, tags, createdBy) => {
 
   if (!result.acknowledged) {
     throw new Error("Could not create forum");
+  }
+
+  try {
+    const redisClient = getRedisClient();
+    await redisClient.del(`forums:university:${universityId}`);
+    console.log("University forums cache invalidated for:", universityId);
+  } catch (error) {
+    console.error("Redis cache invalidation error:", error);
   }
 
   return {

@@ -37,3 +37,11 @@ export const getUniversityById = async (id) => {
 
   return university;
 };
+
+export const getUniversityDropdown = async () => {
+  const universitiesCollection = await getUniversitiesCollection();
+  const universities = await universitiesCollection
+    .find({}, { projection: { _id: 1, name: 1 } })
+    .toArray();
+  return universities;
+};

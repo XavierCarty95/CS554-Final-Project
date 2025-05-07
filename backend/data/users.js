@@ -31,6 +31,18 @@ export const createUser = async (email, password, name, role, universityId) => {
   validatePassword(password);
   role = strCheck(role, "role");
 
+  if (role !== "student" && role !== "incoming" && role !== "professor") {
+    throw new Error("Role must be either student, incoming or professor");
+  }
+  if (role === "incoming") {
+    universityId = "";
+  } else {
+    universityId = strCheck(universityId, "universityId");
+    if (!ObjectId.isValid(universityId)) {
+      throw new Error("Invalid university ID");
+    }
+  }
+
   let userCollection = await users();
   try {
     const auth = getAuth();
@@ -96,4 +108,23 @@ export const loginUser = async (email, password) => {
     console.error("Login error:", e);
     return { signInCompleted: false };
   }
+};
+
+export const getUserById = async (userId) => {
+  userId = strCheck(userId, "userId");
+  if (!ObjectId.isValid(new ObjectId(userId))) {
+    throw new Error("Invalid user ID");
+  }
+  console.log("Fetching user with ID:", userId);
+
+  let userCollection = await users();
+  const user = await userCollection.findOne({
+    _id: new ObjectId(userId),
+  });
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  return { ...user, _id: user._id.toString() };
 };
