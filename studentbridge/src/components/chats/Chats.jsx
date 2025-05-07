@@ -1,29 +1,25 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "../../config/axiosConfig";
 import { NavLink } from "react-router-dom";
+import io from "socket.io-client";
+
 export default function Chats() {
   const [activeTab, setActiveTab] = useState(null);
   const [chatRequests, setChatRequests] = useState([]);
   const [personalChatsList, setPersonalChatsList] = useState([]);
-  const [groupsList, setGroupsList] = useState([]);
   const [selectedChat, setSelectedChat] = useState(null);
-
-  const handleTabChange = (index) => {
-    setActiveTab(index);
-    if (index === 2) {
-      fetchChatRequests();
-    }
-    if (index === 0) {
-      fetchPersonalChats();
-    }
-  };
+  const [state, setState] = useState({
+    message: "",
+    name: "You",
+  });
+  const [chats, setChats] = useState({});
+  const chatRefs = useRef({});
 
   const fetchChatRequests = async () => {
     try {
       const response = await axios.get("/chat/getChatRequests");
       if (response.status === 200) {
-        const chatRequestsData = response.data;
-        setChatRequests(chatRequestsData);
+        setChatRequests(response.data);
       }
     } catch (error) {
       console.error("Error fetching chat requests:", error);
@@ -31,11 +27,63 @@ export default function Chats() {
   };
 
   const fetchPersonalChats = async () => {
-    const response = await axios.get(`/chat/listPersonalChats`);
-    if (response.status === 200) {
-      const personalChatsData = response.data;
-      setPersonalChatsList(personalChatsData);
+    try {
+      const response = await axios.get("/chat/listPersonalChats");
+      if (response.status === 200) {
+        setPersonalChatsList(response.data);
+        if (response.data.length > 0) {
+          setState({ message: "", name: response.data[0].senderName });
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching personal chats:", error);
     }
+  };
+
+  const handleTabChange = (index) => {
+    setActiveTab(index);
+    if (index === 2) fetchChatRequests();
+    if (index === 0) fetchPersonalChats();
+  };
+
+  const handleChatSelect = (chat) => {
+    setChats((prevChats) => ({ ...prevChats, [chat._id]: chat.messages }));
+    setSelectedChat(chat);
+    if (!chatRefs.current[chat._id]) {
+      const socket = io("http://localhost:3000");
+      chatRefs.current[chat._id] = socket;
+
+      socket.on("chatMessage", ({ name, message, chatId }) => {
+        if (chatId === chat._id) {
+          setChats((prevChats) => ({
+            ...prevChats,
+            [chatId]: [...(prevChats[chatId] || []), { name, message }],
+          }));
+        }
+      });
+
+      socket.emit("user_join", chat._id);
+    }
+  };
+
+  const onMessageSubmit = (e) => {
+    e.preventDefault();
+    const msgEle = document.getElementById("message");
+    const message = msgEle.value;
+
+    if (message.trim() === "" || !selectedChat) return;
+
+    const chatId = selectedChat._id;
+    const socket = chatRefs.current[chatId];
+
+    socket.emit("chatMessage", {
+      name: state.name,
+      message,
+      chatId,
+    });
+
+    msgEle.value = "";
+    msgEle.focus();
   };
 
   const handleAcceptRequest = async (requestId) => {
@@ -47,6 +95,7 @@ export default function Chats() {
         setChatRequests((prevRequests) =>
           prevRequests.filter((request) => request._id !== requestId)
         );
+        fetchPersonalChats();
       }
     } catch (error) {
       console.error("Error accepting chat request:", error);
@@ -111,15 +160,9 @@ export default function Chats() {
                   <div
                     key={chat._id}
                     className="border-b p-4 flex justify-between items-center hover:bg-gray-100 cursor-pointer"
-                    onClick={() => setSelectedChat(chat)}
+                    onClick={() => handleChatSelect(chat)}
                   >
-                    <strong>
-                      {chat.name ||
-                        chat.members
-                          .filter((member) => member.name !== "You")
-                          .map((member) => member.name)
-                          .join(", ")}
-                    </strong>
+                    <strong>{chat.name || "Unknown Chat"}</strong>
                   </div>
                 ))
               ) : (
@@ -180,36 +223,38 @@ export default function Chats() {
       <div className="w-2/3 flex flex-col bg-white shadow-md">
         {selectedChat ? (
           <>
-            <div className="p-4 border-b"></div>
-            <h2 className="text-xl font-bold">
-              Chat with {selectedChat.name || "Unknown"}
-            </h2>
-
+            <div className="p-4 border-b">
+              <h2 className="text-xl font-bold">
+                Chat with {selectedChat.name || "Unknown"}
+              </h2>
+            </div>
             <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
-              {/* Placeholder for selected chat content */}
-              <p className="text-gray-500">Chat messages will appear here.</p>
+              {(chats[selectedChat._id] || []).map((msg, index) => (
+                <div key={index} className="mb-2">
+                  <strong>{msg.name}: </strong>
+                  {msg.message}
+                </div>
+              ))}
             </div>
             <div className="p-4 border-t flex items-center space-x-2">
-              <input
-                type="text"
-                placeholder="Type a message..."
-                className="flex-1 border rounded px-4 py-2 focus:ring focus:ring-blue-300"
-              />
-              <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-                Send
-              </button>
+              <form className="chatform" onSubmit={onMessageSubmit}>
+                <input
+                  name="message"
+                  id="message"
+                  placeholder="Type a message..."
+                  className="flex-1 border rounded px-4 py-2 focus:ring focus:ring-blue-300"
+                  autoFocus
+                />
+                <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                  Send
+                </button>
+              </form>
             </div>
           </>
         ) : (
-          <>
-            <div className="p-4 border-b">
-              <h2 className="text-xl font-bold">Chat Content</h2>
-            </div>
-            <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
-              {/* Placeholder for chat content */}
-              <p className="text-gray-500">Select a chat to view messages.</p>
-            </div>
-          </>
+          <div className="flex-1 flex items-center justify-center">
+            <p className="text-gray-500">Select a chat to view messages.</p>
+          </div>
         )}
       </div>
     </div>

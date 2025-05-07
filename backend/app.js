@@ -14,7 +14,7 @@ connectRedis()
   .then(() => console.log("Redis initialized"))
   .catch((err) => console.error("Failed to initialize Redis:", err));
 
-  const httpServer = createServer(app);
+const httpServer = createServer(app);
 
 initializeSocket(httpServer);
 
@@ -54,7 +54,7 @@ const initialiseFirebase = firebaseAuth;
 
 constructorMethod(app);
 
-app.listen(3000, () => {
+httpServer.listen(3000, () => {
   console.log("We've now got a server!");
   console.log("Your routes will be running on http://localhost:3000");
 });

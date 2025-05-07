@@ -109,14 +109,14 @@ export const listPersonalChats = async (userId) => {
     chatList.map(async (chat) => {
       const populatedMembers = await Promise.all(
         chat.members.map(async (memberId) => {
-          if (memberId === userId) {
-            return { _id: userId, name: "You" };
-          }
           const member = await userCollection.findOne({
             _id: new ObjectId(memberId),
           });
           if (memberId !== userId) {
             chat.name = member.name;
+          }
+          if (memberId === userId) {
+            chat.senderName = member.name;
           }
           return member;
         })
