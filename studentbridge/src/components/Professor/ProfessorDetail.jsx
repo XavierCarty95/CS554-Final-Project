@@ -9,6 +9,7 @@ function ProfessorDetailPage() {
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
   const [error, setError] = useState(null);
+  const [userId, setUserId] = useState(null);
 
   useEffect(() => {
     // Fetch professor
@@ -25,6 +26,10 @@ function ProfessorDetailPage() {
       .get(`/reviews/${professorId}`)
       .then((res) => setReviews(res.data))
       .catch(() => setError("Could not load revie"));
+
+    axios.get("/verify")
+      .then((res) => setUserId(res.data._id))
+      .catch(() => console.warn("No user session found"));
   }, [universityId, professorId]);
 
   const handleSubmit = async (e) => {
@@ -32,7 +37,7 @@ function ProfessorDetailPage() {
     try {
       await axios.post("/reviews", {
         professorId,
-        userId: "mockUserId", // 🔐 Replace with real user ID when auth is added
+        userId: userId,
         rating: Number(rating),
         comment,
       });
@@ -43,6 +48,7 @@ function ProfessorDetailPage() {
       const refreshed = await axios.get(`/reviews/${professorId}`);
       setReviews(refreshed.data);
     } catch (err) {
+        console.log(err.message)
       setError("Failed to submit review");
     }
   };
