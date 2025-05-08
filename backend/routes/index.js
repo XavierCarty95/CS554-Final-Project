@@ -7,9 +7,6 @@ import user_routes from "./user_routes.js";
 import professorRoutes from "./professors.js";
 import reviewsRoutes from "./reviews.js";
 import coursesRoutes from "./courses.js";
-import user_routes from "./user_routes.js";
-import professorRoutes from './professors.js';
-import reviewsRoutes from "./reviews.js";
 import dotenv from "dotenv";
 dotenv.config();
 
