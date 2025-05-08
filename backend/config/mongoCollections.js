@@ -22,4 +22,5 @@ export const chatRequests = getCollectionFn("chatRequests");
 export const professorReviews = getCollectionFn("professorReviews");
 export const professors = getCollectionFn("professors");
 export const reviews = getCollectionFn("reviews");
+export const courses = getCollectionFn("courses");
 export const chats = getCollectionFn("chats");

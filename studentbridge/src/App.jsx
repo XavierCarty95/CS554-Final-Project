@@ -68,17 +68,20 @@ function App() {
         )}
         {isLoggedIn && currentUser && (
           <div className="navlink-container">
+            <NavLink className="navlink" to="/dashboard">
+              Dashboard
+            </NavLink>
             <NavLink className="navlink" to="/university">
               Universities
             </NavLink>
             <NavLink className={"navlink"} to="/chats">
               Chats
             </NavLink>
-            <NavLink className="navlink" to="/logout">
-              Logout
-            </NavLink>
             <NavLink className="navlink" to={`/profile/${currentUser._id}`}>
               Profile
+            </NavLink>
+            <NavLink className="navlink" to="/logout">
+              Logout
             </NavLink>
           </div>
         )}

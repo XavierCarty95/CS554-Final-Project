@@ -18,6 +18,13 @@ const dbConnection = async () => {
     _connection = await client.connect();
     // _db = await _connection.db(mongoConfig.database);
     _db = await _connection.db(mongoConfig.database);
+    // Create indexes for the courses collection
+    await _db
+      .collection("courses")
+      .createIndex(
+        { title: "text", description: "text" },
+        { name: "CourseTextIndex" }
+      );
   }
   return _db;
 };
@@ -26,4 +33,4 @@ const closeConnection = async () => {
   await _connection.close();
 };
 
-export { dbConnection, closeConnection };
+export { dbConnection, closeConnection, client };
