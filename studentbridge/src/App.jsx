@@ -20,7 +20,7 @@ import axiosInstance from "./config/axiosConfig";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ProfessorDetailPage from "./components/Professor/ProfessorDetail";
 import Profile from "./components/Profile/ProfilePage";
-
+import Chats from "./components/chats/Chats.jsx";
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
@@ -48,22 +48,13 @@ function App() {
       }
     };
     verifyLogin();
-  }, [currentUser, isLoggedIn]);
+  }, [isLoggedIn]);
 
   return (
     <div className="App">
       <nav className="navbar">
         <NavLink className="navlink" to="/">
           Home
-        </NavLink>
-        {/* <NavLink className="navlink" to="/university/:universityid/forums">
-          Forum
-        </NavLink> */}
-        <NavLink className="navlink" to="/login">
-          login
-        </NavLink>
-        <NavLink className="navlink" to="/university">
-          Universities
         </NavLink>
         {!isLoggedIn && (
           <div className="navlink-container">
@@ -83,20 +74,14 @@ function App() {
             <NavLink className="navlink" to="/university">
               Universities
             </NavLink>
+            <NavLink className={"navlink"} to="/chats">
+              Chats
+            </NavLink>
             <NavLink className="navlink" to={`/profile/${currentUser._id}`}>
               Profile
             </NavLink>
             <NavLink className="navlink" to="/logout">
               Logout
-            </NavLink>
-            <NavLink className="navlink" to="/university">
-              Universities
-            </NavLink>
-            <NavLink className="navlink" to="/logout">
-              Logout
-            </NavLink>
-            <NavLink className="navlink" to={`/profile/${currentUser._id}`}>
-              Profile
             </NavLink>
           </div>
         )}
@@ -125,7 +110,11 @@ function App() {
         <Route
           path="/dashboard"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute
+              isLoggedIn={isLoggedIn}
+              setIsLoggedIn={setIsLoggedIn}
+              setCurrentUser={setCurrentUser}
+            >
               <Dashboard />
             </ProtectedRoute>
           }
@@ -143,10 +132,6 @@ function App() {
           path="/university/:universityId/professors/:professorId"
           element={<ProfessorDetailPage />}
         />
-  path="/university/:universityId/professors"
-  element={<ProfessorsPage />}
-/>
-<Route path="/university/:universityId/professors/:professorId" element={<ProfessorDetailPage />} />
         <Route
           path="/university/:universityId/forums"
           element={<ForumPage />}
@@ -168,6 +153,18 @@ function App() {
           }
         />
         <Route path="/profile/:userId" element={<Profile />} />
+        <Route
+          path="/chats"
+          element={
+            <ProtectedRoute
+              isLoggedIn={isLoggedIn}
+              setIsLoggedIn={setIsLoggedIn}
+              setCurrentUser={setCurrentUser}
+            >
+              <Chats />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </div>
   );
