@@ -27,7 +27,6 @@ router.get('/byUniversity/:universityId', async (req, res) => {
 
       const professorIds = university.professors || [];
 
-      // Fetch full professor documents with ratings
       const profDocs = await professorCollection
         .find({ _id: { $in: professorIds.map(id => new ObjectId(id)) } })
         .toArray();
