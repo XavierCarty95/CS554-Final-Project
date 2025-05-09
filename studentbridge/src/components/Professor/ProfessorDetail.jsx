@@ -10,9 +10,13 @@ function ProfessorDetailPage() {
   const [comment, setComment] = useState("");
   const [error, setError] = useState(null);
   const [userId, setUserId] = useState(null);
+  const [userName, setUserName] = useState("");
+
+  const [editingReviewId, setEditingReviewId] = useState(null);
+  const [editRating, setEditRating] = useState(5);
+  const [editComment, setEditComment] = useState("");
 
   useEffect(() => {
-    // Fetch professor
     axios
       .get(`/professors/byUniversity/${universityId}`)
       .then((res) => {
@@ -21,21 +25,39 @@ function ProfessorDetailPage() {
       })
       .catch(() => setError("Failed to load professor data"));
 
-    // Fetch reviews
     axios
       .get(`/reviews/${professorId}`)
       .then((res) => setReviews(res.data))
-      .catch(() => setError("Could not load revie"));
+      .catch(() => setError("Could not load reviews"));
 
-    axios.get("/verify")
-      .then((res) => setUserId(res.data._id))
+    axios
+      .get("/verify")
+      .then((res) => {
+        setUserId(res.data._id);
+        setUserName(res.data.name);
+      })
       .catch(() => console.warn("No user session found"));
   }, [universityId, professorId]);
 
+  const handleDelete = async (reviewId) => {
+    try {
+      await axios.delete(`/reviews/${reviewId}`);
+      setReviews((prev) => prev.filter((r) => r._id !== reviewId));
+    } catch (err) {
+      console.error("Failed to delete review");
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const userReviews = reviews.filter((r) => r.userId === userId);
+    if (userReviews.length >= 2) {
+      setError("You can only post up to 2 reviews.");
+      return;
+    }
+
     try {
-      await axios.post("/reviews", {
+      const res = await axios.post("/reviews", {
         professorId,
         userId: userId,
         rating: Number(rating),
@@ -43,13 +65,30 @@ function ProfessorDetailPage() {
       });
       setRating(5);
       setComment("");
-
-      // Refresh reviews
-      const refreshed = await axios.get(`/reviews/${professorId}`);
-      setReviews(refreshed.data);
+      setReviews((prev) => [...prev, res.data]);
     } catch (err) {
-        console.log(err.message)
+      console.log(err.message);
       setError("Failed to submit review");
+    }
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.put(`/reviews/${editingReviewId}`, {
+        rating: Number(editRating),
+        comment: editComment,
+      });
+      setReviews((prev) =>
+        prev.map((r) =>
+          r._id === editingReviewId ? { ...r, rating: editRating, comment: editComment } : r
+        )
+      );
+      setEditingReviewId(null);
+      setEditRating(5);
+      setEditComment("");
+    } catch (err) {
+      setError("Failed to edit review");
     }
   };
 
@@ -106,11 +145,66 @@ function ProfessorDetailPage() {
               <p className="font-semibold text-yellow-700">
                 ⭐ {rev.rating} / 5
               </p>
-              <p>{rev.comment}</p>
+              {editingReviewId === rev._id ? (
+                <form onSubmit={handleEditSubmit} className="space-y-2 mt-2">
+                  <select
+                    value={editRating}
+                    onChange={(e) => setEditRating(e.target.value)}
+                    className="border p-1 rounded"
+                  >
+                    {[1, 2, 3, 4, 5].map((n) => (
+                      <option key={n} value={n}>
+                        {n}
+                      </option>
+                    ))}
+                  </select>
+                  <textarea
+                    className="w-full border p-1 rounded"
+                    value={editComment}
+                    onChange={(e) => setEditComment(e.target.value)}
+                    required
+                  />
+                  <div className="flex gap-2">
+                    <button type="submit" className="text-green-600 hover:underline text-sm">
+                      Save
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setEditingReviewId(null)}
+                      className="text-gray-500 hover:underline text-sm"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <p>{rev.comment}</p>
+              )}
               {rev.createdAt && (
                 <p className="text-sm text-gray-500 mt-1">
+                  {rev.userName ? rev.userName + " • " : ""}
                   {new Date(rev.createdAt).toLocaleDateString()}
                 </p>
+              )}
+              {rev.userId === userId && (
+                <div className="mt-2 flex gap-4">
+                  <button
+                    onClick={() => handleDelete(rev._id)}
+                    className="text-red-500 hover:underline text-sm"
+                  >
+                    Delete
+                  </button>
+                  <button
+                    onClick={() => {
+                      setEditingReviewId(rev._id);
+                      setEditRating(rev.rating);
+                      setEditComment(rev.comment);
+                    }}
+                    className="text-blue-500 hover:underline text-sm"
+                  >
+                    Edit
+                  </button>
+                </div>
               )}
             </li>
           ))}
