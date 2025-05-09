@@ -1,4 +1,4 @@
-// routes/university_routes.js
+
 import express from "express";
 import * as universitiesData from "../data/universities.js";
 

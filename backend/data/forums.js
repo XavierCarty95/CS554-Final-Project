@@ -1,5 +1,5 @@
-// data/forums.js
-import { forums } from "../config/mongoCollections.js";
+
+import { forums, users } from "../config/mongoCollections.js";
 import { ObjectId } from "mongodb";
 import { getRedisClient } from "../config/connectRedis.js";
 
@@ -8,10 +8,10 @@ export const getForumsByUniversity = async (universityId) => {
     throw new Error("Invalid university ID");
   }
 
+
   try {
     const redisClient = getRedisClient();
     const cacheKey = `forums:university:${universityId}`;
-
     const cachedData = await redisClient.get(cacheKey);
     if (cachedData) {
       console.log("Forums fetched from cache for university:", universityId);
@@ -20,6 +20,7 @@ export const getForumsByUniversity = async (universityId) => {
   } catch (error) {
     console.error("Redis error in getForumsByUniversity:", error);
   }
+
 
   const forumsCollection = await forums();
   let uniIdQuery;
@@ -36,10 +37,26 @@ export const getForumsByUniversity = async (universityId) => {
     .sort({ createdAt: -1 })
     .toArray();
 
+  const userCollection = await users();
+  for (const forum of forumList) {
+    let createdByObj;
+    try {
+      createdByObj = ObjectId.isValid(forum.createdBy)
+        ? new ObjectId(forum.createdBy)
+        : forum.createdBy;
+    } catch (e) {
+      createdByObj = forum.createdBy;
+    }
+
+    const author = await userCollection.findOne({ _id: createdByObj });
+    forum.authorName = author ? author.name : "Unknown User";
+  }
+
+
   try {
     const redisClient = getRedisClient();
     const cacheKey = `forums:university:${universityId}`;
-    await redisClient.setEx(cacheKey, 600, JSON.stringify(forumList)); // 10 minutes cache
+    await redisClient.setEx(cacheKey, 600, JSON.stringify(forumList));
     console.log("Forums cached for university:", universityId);
   } catch (error) {
     console.error("Redis caching error:", error);

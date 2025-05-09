@@ -1,10 +1,10 @@
-import axios from "../config/axiosConfig";
+import axiosInstance from "../config/axiosConfig";
 
 const BASE_URL = "/university";
 
 export async function getForums(universityId) {
   try {
-    const response = await axios.get(`${BASE_URL}/${universityId}/forums`);
+    const response = await axiosInstance.get(`${BASE_URL}/${universityId}/forums`);
     return response.data;
   } catch (error) {
     console.error("Error fetching forums:", error);
@@ -14,7 +14,7 @@ export async function getForums(universityId) {
 
 export async function getPosts(forumId, universityId) {
   try {
-    const response = await axios.get(
+    const response = await axiosInstance.get(
       `${BASE_URL}/${universityId}/forums/${forumId}/posts`
     );
     return response.data;
@@ -26,7 +26,7 @@ export async function getPosts(forumId, universityId) {
 
 export async function getForumById(forumId, universityId) {
   try {
-    const response = await axios.get(
+    const response = await axiosInstance.get(
       `${BASE_URL}/${universityId}/forums/${forumId}`
     );
     return response.data;
@@ -38,7 +38,7 @@ export async function getForumById(forumId, universityId) {
 
 export async function createForum({ title, universityId, tags }) {
   try {
-    const response = await axios.post(`${BASE_URL}/${universityId}/forums`, {
+    const response = await axiosInstance.post(`${BASE_URL}/${universityId}/forums`, {
       title,
       tags,
     });
@@ -51,7 +51,7 @@ export async function createForum({ title, universityId, tags }) {
 
 export async function createPost({ forumId, content, universityId }) {
   try {
-    const response = await axios.post(
+    const response = await axiosInstance.post(
       `${BASE_URL}/${universityId}/forums/${forumId}/posts`,
       {
         content,
@@ -66,7 +66,7 @@ export async function createPost({ forumId, content, universityId }) {
 
 export async function votePost(postId, voteType, universityId) {
   try {
-    const response = await axios.post(
+    const response = await axiosInstance.post(
       `${BASE_URL}/${universityId}/forums/posts/${postId}/vote`,
       {
         voteType,

@@ -1,4 +1,4 @@
-// routes/professors.js
+
 import express from 'express';
 import { professors, reviews } from '../config/mongoCollections.js';
 import { ObjectId } from 'mongodb';

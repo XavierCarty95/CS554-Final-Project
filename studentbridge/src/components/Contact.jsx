@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "../config/axiosConfig";
+import axiosInstance from "../config/axiosConfig";
 
 export default function Contact() {
   const [message, setMessage] = useState("");
@@ -9,7 +9,7 @@ export default function Contact() {
     setStatus("sending");
 
     try {
-      await axios.post("/contact", { message });
+      await axiosInstance.post("/contact", { message });
       setStatus("success");
       setMessage("");
     } catch (err) {

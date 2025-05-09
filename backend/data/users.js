@@ -69,7 +69,7 @@ export const createUser = async (email, password, name, role, universityId) => {
       const professorsCollection = await professors();
       const professorDoc = {
         name,
-        department: "", // You can prompt for this in the signup if needed
+        department: "",
         universityId: new ObjectId(universityId),
       };
       await professorsCollection.insertOne(professorDoc);

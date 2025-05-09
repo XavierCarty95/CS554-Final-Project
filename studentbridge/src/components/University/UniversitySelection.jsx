@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 
 import { useNavigate } from "react-router-dom";
-import axios from "../../config/axiosConfig.js";
+import axiosInstance from "../../config/axiosConfig.js";
 
 const UniversitySelection = () => {
   const [universities, setUniversities] = useState([]);
@@ -11,7 +11,7 @@ const UniversitySelection = () => {
 
   useEffect(() => {
     setLoading(true);
-    axios
+    axiosInstance
       .get("/universities")
       .then((response) => {
         setUniversities(response.data);

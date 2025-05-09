@@ -6,7 +6,7 @@ import firebaseAuth from "./config/firebase.js";
 import cors from "cors";
 import { connectRedis } from "./config/connectRedis.js";
 import { createServer } from "http";
-import { initializeSocket } from "./socket.js"; // Import the Socket.IO logic
+import { initializeSocket } from "./socket.js";
 
 const app = express();
 

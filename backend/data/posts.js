@@ -1,4 +1,4 @@
-// data/posts.js
+
 import { ObjectId } from "mongodb";
 import { posts, forums, users } from "../config/mongoCollections.js";
 import { getRedisClient } from "../config/connectRedis.js";

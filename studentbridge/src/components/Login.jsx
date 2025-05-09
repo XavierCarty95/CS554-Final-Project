@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import axios from "../config/axiosConfig";
+import axiosInstance from "../config/axiosConfig";
 
 const Login = (props) => {
   const [email, setEmail] = useState("");
@@ -13,7 +13,7 @@ const Login = (props) => {
       alert("Please enter a valid email address.");
       return;
     }
-    await axios
+    await axiosInstance
       .post("/login", { email, password })
       .then(() => {
         alert("Login successful! Redirecting to dashboard...");

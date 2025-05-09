@@ -1,7 +1,7 @@
 // src/components/University/UniversityProfile.jsx
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "../../config/axiosConfig";
+import axiosInstance from "../../config/axiosConfig";
 
 const UniversityProfile = () => {
   const { universityId } = useParams();
@@ -12,7 +12,7 @@ const UniversityProfile = () => {
 
   useEffect(() => {
     setIsLoading(true);
-    axios
+    axiosInstance
       .get(`/universities/${universityId}`)
       .then((response) => {
         setUniversity(response.data);

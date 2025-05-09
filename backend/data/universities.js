@@ -1,4 +1,4 @@
-// data/universities.js
+
 import { dbConnection } from "../config/mongoConnection.js";
 import { ObjectId } from "mongodb";
 

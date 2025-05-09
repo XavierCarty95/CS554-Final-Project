@@ -1,6 +1,7 @@
+/* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import axios from "../../config/axiosConfig";
+import axiosInstance from "../../config/axiosConfig";
 
 function ProfessorDetailPage() {
   const { universityId, professorId } = useParams();
@@ -10,6 +11,7 @@ function ProfessorDetailPage() {
   const [comment, setComment] = useState("");
   const [error, setError] = useState(null);
   const [userId, setUserId] = useState(null);
+  // eslint-disable-next-line no-unused-vars
   const [userName, setUserName] = useState("");
 
   const [editingReviewId, setEditingReviewId] = useState(null);
@@ -17,7 +19,7 @@ function ProfessorDetailPage() {
   const [editComment, setEditComment] = useState("");
 
   useEffect(() => {
-    axios
+    axiosInstance
       .get(`/professors/byUniversity/${universityId}`)
       .then((res) => {
         const found = res.data.find((p) => p._id === professorId);
@@ -25,12 +27,12 @@ function ProfessorDetailPage() {
       })
       .catch(() => setError("Failed to load professor data"));
 
-    axios
+      axiosInstance
       .get(`/reviews/${professorId}`)
       .then((res) => setReviews(res.data))
       .catch(() => setError("Could not load reviews"));
 
-    axios
+      axiosInstance
       .get("/verify")
       .then((res) => {
         setUserId(res.data._id);
@@ -41,7 +43,7 @@ function ProfessorDetailPage() {
 
   const handleDelete = async (reviewId) => {
     try {
-      await axios.delete(`/reviews/${reviewId}`);
+      await axiosInstance.delete(`/reviews/${reviewId}`);
       setReviews((prev) => prev.filter((r) => r._id !== reviewId));
     } catch (err) {
       console.error("Failed to delete review");
@@ -57,7 +59,7 @@ function ProfessorDetailPage() {
     }
 
     try {
-      const res = await axios.post("/reviews", {
+      const res = await axiosInstance.post("/reviews", {
         professorId,
         userId: userId,
         rating: Number(rating),
@@ -75,7 +77,7 @@ function ProfessorDetailPage() {
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.put(`/reviews/${editingReviewId}`, {
+      const res = await axiosInstance.put(`/reviews/${editingReviewId}`, {
         rating: Number(editRating),
         comment: editComment,
       });

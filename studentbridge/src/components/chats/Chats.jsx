@@ -1,5 +1,6 @@
+// eslint-disable-next-line no-unused-vars
 import React, { useEffect, useState, useRef } from "react";
-import axios from "../../config/axiosConfig";
+import axiosInstance from "../../config/axiosConfig";
 import { NavLink } from "react-router-dom";
 import io from "socket.io-client";
 
@@ -17,7 +18,7 @@ export default function Chats() {
 
   const fetchChatRequests = async () => {
     try {
-      const response = await axios.get("/chat/getChatRequests");
+      const response = await axiosInstance.get("/chat/getChatRequests");
       if (response.status === 200) {
         setChatRequests(response.data);
       }
@@ -28,7 +29,7 @@ export default function Chats() {
 
   const fetchPersonalChats = async () => {
     try {
-      const response = await axios.get("/chat/listPersonalChats");
+      const response = await axiosInstance.get("/chat/listPersonalChats");
       if (response.status === 200) {
         setPersonalChatsList(response.data);
         if (response.data.length > 0) {
@@ -88,7 +89,7 @@ export default function Chats() {
 
   const handleAcceptRequest = async (requestId) => {
     try {
-      const response = await axios.post("/chat/acceptChatRequest", {
+      const response = await axiosInstance.post("/chat/acceptChatRequest", {
         requestId,
       });
       if (response.status === 200) {
@@ -104,7 +105,7 @@ export default function Chats() {
 
   const handleRejectRequest = async (requestId) => {
     try {
-      const response = await axios.post("/chat/rejectChatRequest", {
+      const response = await axiosInstance.post("/chat/rejectChatRequest", {
         requestId,
       });
       if (response.status === 200) {

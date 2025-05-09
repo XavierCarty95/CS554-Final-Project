@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "../config/axiosConfig";
+import axiosInstance from "../config/axiosConfig";
 import { useNavigate } from "react-router-dom";
 
 function Signup(props) {
@@ -19,7 +19,7 @@ function Signup(props) {
   useEffect(() => {
     const fetchUniversities = async () => {
       try {
-        const response = await axios.get("/universities/getUniversityDropdown");
+        const response = await axiosInstance.get("/universities/getUniversityDropdown");
         setUniversities(response.data);
       } catch (error) {
         console.error("Error fetching universities:", error);
@@ -56,7 +56,7 @@ function Signup(props) {
       universityId: formData.university,
     };
 
-    axios
+    axiosInstance
       .post("/signup", user)
       // eslint-disable-next-line no-unused-vars
       .then((response) => {
