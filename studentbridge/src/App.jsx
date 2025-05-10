@@ -11,8 +11,6 @@ import UniversitySelection from "./components/University/UniversitySelection";
 import UniversityProfile from "./components/University/UniversityProfile";
 import About from "./components/About";
 import Privacy from "./components/Privacy";
-import CourseDetail from "./components/Courses/CourseDetail.jsx";
-import CourseList from "./components/Courses/CourseList.jsx";
 import ProfessorsPage from "./components/Professor/ProfessorsPage";
 import Contact from "./components/Contact";
 import ThreadDetailPage from "./components/Forum/ThreadDetailPage";
@@ -22,6 +20,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import ProfessorDetailPage from "./components/Professor/ProfessorDetail";
 import Profile from "./components/Profile/ProfilePage";
 import Chats from "./components/chats/Chats.jsx";
+import CourseList from "./components/Courses/CourseList";
+import CourseDetail from "./components/Courses/CourseDetail";
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
