@@ -60,18 +60,14 @@ router.post("/rejectChatRequest", ensureAuthenticated, async (req, res) => {
   }
 });
 
-router.get(
-  "/listPersonalChats",
-  ensureAuthenticated,
-  async (req, res) => {
-    const userId = req.session.user._id;
-    try {
-      const personalChats = await listPersonalChats(userId);
-      return res.status(200).json(personalChats);
-    } catch (e) {
-      return res.status(400).json({ error: e.message });
-    }
+router.get("/listPersonalChats", ensureAuthenticated, async (req, res) => {
+  const userId = req.session.user._id;
+  try {
+    const personalChats = await listPersonalChats(userId);
+    return res.status(200).json(personalChats);
+  } catch (e) {
+    return res.status(400).json({ error: e.message });
   }
-);
+});
 
 export default router;
