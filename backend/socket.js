@@ -15,6 +15,7 @@ export const initializeSocket = (httpServer) => {
     });
 
     socket.on("chatMessage", async (data) => {
+      console.log(data);
       const chatCol = await chats();
       await chatCol.findOneAndUpdate(
         { _id: new ObjectId(data.chatId) },
