@@ -1,4 +1,4 @@
-// forum_routes.js
+
 import express from "express";
 import * as forumsData from "../data/forums.js";
 import * as postsData from "../data/posts.js";

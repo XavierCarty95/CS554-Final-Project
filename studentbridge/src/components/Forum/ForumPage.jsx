@@ -1,4 +1,3 @@
-// src/components/Forum/ForumPage.jsx
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { getForums, createForum } from "../../services/forumServices";
@@ -7,8 +6,10 @@ import NewThreadForm from "./NewThreadForm";
 export default function ForumPage() {
   const { universityId } = useParams();
   const [forums, setForums] = useState([]);
+  const [filteredForums, setFilteredForums] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchTags, setSearchTags] = useState("");
 
   useEffect(() => {
     if (!universityId) {
@@ -24,6 +25,7 @@ export default function ForumPage() {
       .then((data) => {
         console.log("Forums loaded:", data);
         setForums(data);
+        setFilteredForums(data); // Initialize filtered forums with all forums
         setIsLoading(false);
       })
       .catch((err) => {
@@ -42,10 +44,39 @@ export default function ForumPage() {
         tags,
       });
       setForums((prev) => [newForum, ...prev]);
+      setFilteredForums((prev) => [newForum, ...prev]); // Update filtered forums too
     } catch (err) {
       console.error("Error creating forum:", err);
       alert(err.response?.data?.error || "Failed to create forum");
     }
+  };
+
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchTags(value);
+
+    if (value.trim() === "") {
+      setFilteredForums(forums); // Show all forums when search is empty
+      return;
+    }
+
+    // Split the search input by commas and clean up each tag
+    const searchTagsArray = value
+      .toLowerCase()
+      .split(",")
+      .map((tag) => tag.trim())
+      .filter((tag) => tag !== "");
+
+    // Filter forums that have at least one matching tag
+    const filtered = forums.filter((forum) => {
+      if (!forum.tags || forum.tags.length === 0) return false;
+      const forumTagsLower = forum.tags.map((tag) => tag.toLowerCase());
+      return searchTagsArray.some((searchTag) =>
+        forumTagsLower.includes(searchTag)
+      );
+    });
+
+    setFilteredForums(filtered);
   };
 
   if (isLoading)
@@ -57,13 +88,25 @@ export default function ForumPage() {
     <div className="max-w-full px-4 py-4 m-10">
       <h2 className="text-2xl font-bold mb-6">University Forums</h2>
       <NewThreadForm onSubmit={handleNewThread} />
-      <div className="mt-8 space-y-4">
-        {forums.length === 0 ? (
+
+      {/* Search input for tags */}
+      <div className="mb-4 mt-6">
+        <input
+          type="text"
+          placeholder="Search by tags (comma separated)"
+          value={searchTags}
+          onChange={handleSearchChange}
+          className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+        />
+      </div>
+
+      <div className="mt-4 space-y-4">
+        {filteredForums.length === 0 ? (
           <p className="text-center text-gray-500">
-            No forums yet. Be the first to create one!
+            No forums match the selected tags.
           </p>
         ) : (
-          forums.map((forum) => (
+          filteredForums.map((forum) => (
             <div
               key={forum._id}
               className="border rounded-lg p-4 bg-white shadow-sm"
@@ -82,8 +125,19 @@ export default function ForumPage() {
                 </div>
               </div>
 
+              {/* Author information - new section */}
+              <div className="mt-2 text-sm">
+                <span className="text-gray-600">Posted by: </span>
+                <Link
+                  to={`/profile/${forum.createdBy}`}
+                  className="text-blue-600 hover:underline"
+                >
+                  {forum.authorName || "Unknown User"}
+                </Link>
+              </div>
+
               {forum.tags && forum.tags.length > 0 && (
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 mt-2">
                   {forum.tags.map((tag, index) => (
                     <span
                       key={index}

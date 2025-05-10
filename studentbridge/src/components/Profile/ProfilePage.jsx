@@ -1,8 +1,13 @@
 // src/components/Profile/ProfilePage.jsx
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { getUserById } from "../../services/userServices";
-import axios from "../../config/axiosConfig";
+import {
+  getUserForumActivity,
+  getUserPostActivity,
+} from "../../services/userActivityServices";
+import axiosInstance from "../../config/axiosConfig";
+import RequestChat from "../chats/RequestChat.jsx";
 
 export default function ProfilePage() {
   const { userId } = useParams();
@@ -11,6 +16,11 @@ export default function ProfilePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [universityName, setUniversityName] = useState("");
+  const [showRequestChat, setShowRequestChat] = useState(false);
+  const [message, setMessage] = useState("");
+  const [forums, setForums] = useState([]);
+  const [posts, setPosts] = useState([]);
+  const [activityLoading, setActivityLoading] = useState(true);
 
   useEffect(() => {
     setIsLoading(true);
@@ -27,17 +37,53 @@ export default function ProfilePage() {
   }, [userId]);
 
   useEffect(() => {
-    axios
+    axiosInstance
       .get("/verify")
       .then((res) => setCurrentUser(res.data))
       .catch(() => setCurrentUser(null));
   }, []);
 
   useEffect(() => {
-    axios.get(`/universities/${profileUser?.universityId}`).then((res) => {
-      setUniversityName(res.data.name);
-    });
+    if (profileUser?.universityId) {
+      axiosInstance.get(`/universities/${profileUser.universityId}`).then((res) => {
+        setUniversityName(res.data.name);
+      });
+    }
+
+    console.log("Profile User:", profileUser);
+    console.log("universityName:", universityName);
   }, [profileUser]);
+
+  // Fetch user activity
+  useEffect(() => {
+    if (profileUser) {
+      setActivityLoading(true);
+
+      // Fetch forums created by user
+      console.log("Fetching forums for user:", userId);
+      getUserForumActivity(userId)
+        .then((data) => {
+          setForums(data);
+        })
+        .catch((err) => {
+          console.error("Error loading forums:", err);
+        });
+
+      // Fetch posts created by user
+      getUserPostActivity(userId)
+        .then((data) => {
+          setPosts(data);
+          setActivityLoading(false);
+        })
+        .catch((err) => {
+          console.error("Error loading posts:", err);
+          setActivityLoading(false);
+        });
+
+      console.log("Forums:", forums);
+      console.log("Posts:", posts);
+    }
+  }, [profileUser, userId]);
 
   if (isLoading)
     return <div className="p-4 text-center">Loading profile...</div>;
@@ -46,8 +92,19 @@ export default function ProfilePage() {
 
   const isOwnProfile = currentUser && currentUser._id === profileUser._id;
 
+  // Format date for display
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
+
   return (
     <div className="max-w-4xl mx-auto p-6">
+      {/* Header section - unchanged */}
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
         <div className="h-40 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
 
@@ -81,9 +138,22 @@ export default function ProfilePage() {
                 Edit Profile
               </button>
             ) : (
-              <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
+              <button
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+                onClick={() => setShowRequestChat(true)}
+              >
                 Message
               </button>
+            )}
+            {showRequestChat && (
+              <RequestChat
+                senderId={currentUser._id}
+                receipentId={profileUser._id}
+                message={message}
+                setMessage={setMessage}
+                showRequestChat={showRequestChat}
+                onClose={() => setShowRequestChat(false)}
+              />
             )}
           </div>
         </div>
@@ -122,12 +192,83 @@ export default function ProfilePage() {
           </div>
         </div>
 
+        {/* Right Column - Activity */}
         <div className="md:col-span-2">
           <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold mb-4">Recent Activity</h2>
-            <div className="text-gray-500 italic">
-              No recent activity to display.
-            </div>
+            <h2 className="text-xl font-semibold mb-4">User Activity</h2>
+
+            {activityLoading ? (
+              <div className="text-center p-4">Loading activity...</div>
+            ) : forums.length === 0 && posts.length === 0 ? (
+              <div className="text-gray-500 italic">
+                No recent activity to display.
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {/* Forums Created */}
+                {forums.length > 0 && (
+                  <div>
+                    <h3 className="text-lg font-medium mb-3">
+                      Discussion Threads Started
+                    </h3>
+                    <div className="space-y-3">
+                      {forums.map((forum) => (
+                        <div key={forum._id} className="border-b pb-3">
+                          <Link
+                            to={`/university/${forum.universityId}/forums/${forum._id}`}
+                            className="text-blue-600 hover:underline font-medium"
+                          >
+                            {forum.title}
+                          </Link>
+                          <div className="flex mt-1 text-sm">
+                            <span className="text-gray-500">
+                              Created on {formatDate(forum.createdAt)}
+                            </span>
+                            {forum.tags && forum.tags.length > 0 && (
+                              <div className="ml-4 flex flex-wrap gap-1">
+                                {forum.tags.map((tag, index) => (
+                                  <span
+                                    key={index}
+                                    className="bg-gray-100 px-2 py-0.5 rounded text-xs text-gray-600"
+                                  >
+                                    {tag}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Posts Created */}
+                {posts.length > 0 && (
+                  <div>
+                    <h3 className="text-lg font-medium mb-3">Replies Posted</h3>
+                    <div className="space-y-3">
+                      {posts.map((post) => (
+                        <div key={post._id} className="border-b pb-3">
+                          <div className="mb-1">
+                            <Link
+                              to={`/university/${post.universityId}/forums/${post.forumId}`}
+                              className="text-blue-600 hover:underline"
+                            >
+                              {post.forumTitle}
+                            </Link>
+                          </div>
+                          <p className="text-gray-700">{post.content}</p>
+                          <div className="text-sm text-gray-500 mt-1">
+                            Posted on {formatDate(post.createdAt)}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

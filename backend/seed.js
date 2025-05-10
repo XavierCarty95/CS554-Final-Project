@@ -20,9 +20,9 @@ async function main() {
     const professorsCollection = await professors();
     const reviewsCollection = await reviews(); 
 
-    // Clear existing data
+
     console.log("Clearing existing collections...");
-    await usersCollection.deleteMany({});
+ 
     await universitiesCollection.deleteMany({});
     await forumsCollection.deleteMany({});
     await postsCollection.deleteMany({});
@@ -73,7 +73,7 @@ async function main() {
     for (const prof of professorData) {
       const insertResult = await professorsCollection.insertOne(prof);
       professorIds.push(insertResult.insertedId);
-      console.log(`✅ Added professor: ${prof.name}`);
+      console.log(`Added professor: ${prof.name}`);
     }
 
     // Update university with professor IDs
@@ -81,7 +81,7 @@ async function main() {
       { _id: universityId },
       { $set: { professors: professorIds } }
     );
-    console.log("✅ University updated with professor references.");
+    console.log(" University updated with professor references.");
 
     // Add reviews for professors
     console.log("Adding reviews...");

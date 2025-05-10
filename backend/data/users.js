@@ -1,4 +1,5 @@
 import { users } from "../config/mongoCollections.js";
+import { professors } from "../config/mongoCollections.js";
 import { ObjectId } from "mongodb";
 import bcrypt from "bcrypt";
 import {
@@ -63,6 +64,15 @@ export const createUser = async (email, password, name, role, universityId) => {
     if (!newUser.acknowledged) {
       await userCredential.user.delete();
       throw new Error("Could not add user to database");
+    }
+    if (role === "professor") {
+      const professorsCollection = await professors();
+      const professorDoc = {
+        name,
+        department: "",
+        universityId: new ObjectId(universityId),
+      };
+      await professorsCollection.insertOne(professorDoc);
     }
     return { ...user, _id: newUser.insertedId.toString() };
   } catch (e) {

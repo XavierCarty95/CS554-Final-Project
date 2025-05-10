@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import axios from "../config/axiosConfig";
+import axiosInstance from "../config/axiosConfig";
 import { useNavigate } from "react-router-dom";
 
 function Search() {
@@ -21,8 +21,12 @@ function Search() {
       setError(null);
       try {
         const [unisRes, profsRes] = await Promise.all([
-          axios.get(`/universities/search?q=${encodeURIComponent(query)}`),
-          axios.get(`/professors/search?q=${encodeURIComponent(query)}`),
+          axiosInstance.get(
+            `/universities/search?q=${encodeURIComponent(query)}`
+          ),
+          axiosInstance.get(
+            `/professors/search?q=${encodeURIComponent(query)}`
+          ),
         ]);
         const uniSuggestions = unisRes.data.map((u) => ({
           id: u.id,

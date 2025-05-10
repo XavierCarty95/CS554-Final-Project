@@ -7,7 +7,7 @@ const ensureAuthenticated = async (req, res, next) => {
   if (!req.session.user) {
     return res.status(401).json({ error: "Authentication required" });
   }
-  next(); // This should be outside the if block
+  next(); 
 };
 
 router.post("/login", async (req, res) => {

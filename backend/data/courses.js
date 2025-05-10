@@ -1,7 +1,7 @@
 import { dbConnection } from "../config/mongoConnection.js";
 import { ObjectId } from "mongodb";
 
-// Helper to get the MongoDB collection
+
 const getCoursesCollection = async () => {
   const db = await dbConnection();
   return db.collection("courses");

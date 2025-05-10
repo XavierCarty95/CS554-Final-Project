@@ -1,7 +1,7 @@
 // src/components/Professor/ProfessorsPage.jsx
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import axios from "../../config/axiosConfig";
+import axiosInstance from "../../config/axiosConfig";
 
 function ProfessorsPage() {
   const { universityId } = useParams();
@@ -9,13 +9,13 @@ function ProfessorsPage() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    axios
+    axiosInstance
       .get(`/professors/byUniversity/${universityId}`)
       .then(async (res) => {
         const profsWithRatings = await Promise.all(
           res.data.map(async (prof) => {
             try {
-              const reviewRes = await axios.get(`/reviews/${prof._id}`);
+              const reviewRes = await axiosInstance.get(`/reviews/${prof._id}`);
               return { ...prof, ratings: reviewRes.data || [] };
             } catch {
               return { ...prof, ratings: [] };

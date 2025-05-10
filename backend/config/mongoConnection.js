@@ -16,9 +16,9 @@ const client = new MongoClient(mongoConfig.serverUrl, {
 const dbConnection = async () => {
   if (!_connection) {
     _connection = await client.connect();
-    // _db = await _connection.db(mongoConfig.database);
+
     _db = await _connection.db(mongoConfig.database);
-    // Create indexes for the courses collection
+
     await _db
       .collection("courses")
       .createIndex(
