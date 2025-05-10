@@ -11,7 +11,6 @@ import UniversitySelection from "./components/University/UniversitySelection";
 import UniversityProfile from "./components/University/UniversityProfile";
 import About from "./components/About";
 import Privacy from "./components/Privacy";
-
 import ProfessorsPage from "./components/Professor/ProfessorsPage";
 import Contact from "./components/Contact";
 import ThreadDetailPage from "./components/Forum/ThreadDetailPage";
@@ -21,6 +20,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import ProfessorDetailPage from "./components/Professor/ProfessorDetail";
 import Profile from "./components/Profile/ProfilePage";
 import Chats from "./components/chats/Chats.jsx";
+import CourseList from "./components/Courses/CourseList";
+import CourseDetail from "./components/Courses/CourseDetail";
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
@@ -133,6 +134,14 @@ function App() {
           element={<ProfessorDetailPage />}
         />
         <Route
+          path="/university/:universityId/professors"
+          element={<ProfessorsPage />}
+        />
+        <Route
+          path="/university/:universityId/professors/:professorId"
+          element={<ProfessorDetailPage />}
+        />
+        <Route
           path="/university/:universityId/forums"
           element={<ForumPage />}
         />
@@ -140,6 +149,8 @@ function App() {
           path="/university/:universityId/forums/:forumId"
           element={<ThreadDetailPage />}
         />
+        <Route path="/courses" element={<CourseList />} />
+        <Route path="/courses/:courseId" element={<CourseDetail />} />
         <Route path="/about" element={<About />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/contact" element={<Contact />} />
