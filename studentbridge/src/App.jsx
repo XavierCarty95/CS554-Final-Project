@@ -11,7 +11,8 @@ import UniversitySelection from "./components/University/UniversitySelection";
 import UniversityProfile from "./components/University/UniversityProfile";
 import About from "./components/About";
 import Privacy from "./components/Privacy";
-
+import CourseDetail from "./components/Courses/CourseDetail.jsx";
+import CourseList from "./components/Courses/CourseList.jsx";
 import ProfessorsPage from "./components/Professor/ProfessorsPage";
 import Contact from "./components/Contact";
 import ThreadDetailPage from "./components/Forum/ThreadDetailPage";
@@ -148,6 +149,8 @@ function App() {
           path="/university/:universityId/forums/:forumId"
           element={<ThreadDetailPage />}
         />
+        <Route path="/courses" element={<CourseList />} />
+        <Route path="/courses/:courseId" element={<CourseDetail />} />
         <Route path="/about" element={<About />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/contact" element={<Contact />} />
