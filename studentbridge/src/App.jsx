@@ -133,6 +133,14 @@ function App() {
           element={<ProfessorDetailPage />}
         />
         <Route
+          path="/university/:universityId/professors"
+          element={<ProfessorsPage />}
+        />
+        <Route
+          path="/university/:universityId/professors/:professorId"
+          element={<ProfessorDetailPage />}
+        />
+        <Route
           path="/university/:universityId/forums"
           element={<ForumPage />}
         />
