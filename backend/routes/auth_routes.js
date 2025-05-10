@@ -7,7 +7,7 @@ const ensureAuthenticated = async (req, res, next) => {
   if (!req.session.user) {
     return res.status(401).json({ error: "Authentication required" });
   }
-  next(); 
+  next();
 };
 
 router.post("/login", async (req, res) => {
@@ -26,6 +26,7 @@ router.post("/login", async (req, res) => {
         _id: user._id,
         role: user.role,
         universityId: user.universityId,
+        name: user.name,
       };
     }
 

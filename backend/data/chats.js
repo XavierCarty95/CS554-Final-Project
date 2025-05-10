@@ -1,4 +1,9 @@
-import { chatRequests, users, chats } from "../config/mongoCollections.js";
+import {
+  chatRequests,
+  users,
+  chats,
+  universities,
+} from "../config/mongoCollections.js";
 import { strCheck, isValidId } from "../helpers.js";
 import { ObjectId } from "mongodb";
 export const requestChats = async (message, receipentId, senderId) => {
@@ -125,4 +130,38 @@ export const listPersonalChats = async (userId) => {
     })
   );
   return chatList;
+};
+
+export const getPublicChat = async (universityId) => {
+  isValidId(universityId, "universityId");
+  const chatCollection = await chats();
+  let chatCol = await chatCollection.findOne({
+    universityId: universityId,
+    type: "public",
+  });
+  if (!chatCol) {
+    var chat = {
+      type: "public",
+      members: [],
+      messages: [],
+      universityId: universityId,
+      createdAt: new Date(),
+      name: "",
+    };
+    const universityCollection = await universities();
+    const university = await universityCollection.findOne({
+      _id: new ObjectId(universityId),
+    });
+    if (!university) {
+      throw new Error("University not found");
+    }
+    chat.name = university.name;
+    await chatCollection.insertOne(chat);
+    chatCol = await chatCollection.findOne({
+      universityId: universityId,
+      type: "public",
+    });
+    return chatCol;
+  }
+  return chatCol;
 };

@@ -7,6 +7,7 @@ import {
   acceptChatRequest,
   rejectChatRequest,
   listPersonalChats,
+  getPublicChat,
 } from "../data/chats.js";
 const router = express.Router();
 
@@ -65,6 +66,16 @@ router.get("/listPersonalChats", ensureAuthenticated, async (req, res) => {
   try {
     const personalChats = await listPersonalChats(userId);
     return res.status(200).json(personalChats);
+  } catch (e) {
+    return res.status(400).json({ error: e.message });
+  }
+});
+
+router.get("/getPublicChat/:uniId", ensureAuthenticated, async (req, res) => {
+  const universityId = req.params.uniId;
+  try {
+    const publicChat = await getPublicChat(universityId);
+    return res.status(200).json(publicChat);
   } catch (e) {
     return res.status(400).json({ error: e.message });
   }
