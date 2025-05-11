@@ -231,6 +231,18 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/add-course"
+          element={
+            <ProtectedRoute
+              isLoggedIn={isLoggedIn}
+              setIsLoggedIn={setIsLoggedIn}
+              setCurrentUser={setCurrentUser}
+            >
+              <AddCourse />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </div>
   );
