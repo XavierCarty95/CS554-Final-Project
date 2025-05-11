@@ -7,6 +7,7 @@ import {
   createCourse,
   deleteCourseById,
   searchCourses,
+  getCoursesForUniversityDropdown 
 } from "../data/courses.js";
 
 const router = express.Router();
@@ -103,5 +104,17 @@ router.delete("/:id", async (req, res) => {
     res.status(400).json({ error: err.message || "Failed to delete course" });
   }
 });
+
+router.get("/university/:universityId/dropdown", async (req, res) => {
+  const { universityId } = req.params;
+  try {
+    const courses = await getCoursesForUniversityDropdown(universityId);
+    res.json(courses);
+  } catch (err) {
+    console.error(`Error fetching dropdown courses for university ${universityId}:`, err);
+    res.status(400).json({ error: err.message || "Failed to fetch courses" });
+  }
+});
+
 
 export default router;

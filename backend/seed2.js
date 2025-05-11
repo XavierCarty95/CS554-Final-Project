@@ -12,7 +12,11 @@ import firebaseApp from "./config/firebase.js";
 
 async function main() {
   try {
-    // Get collection references
+    // Get database connection and clear old data
+    const db = await import("./config/mongoConnection.js").then(m => m.dbConnection());
+    await db.collection("universities").deleteMany({});
+    await db.collection("professors").deleteMany({});
+    await db.collection("courses").deleteMany({});
     const universitiesCollection = await universities();
     const professorsCollection = await professors();
 
@@ -220,6 +224,7 @@ async function main() {
       `Added ${Object.keys(courseResults.insertedIds).length} new courses`
     );
 
+    await import("./config/mongoConnection.js").then(m => m.closeConnection());
     console.log("Seeding completed successfully!");
   } catch (e) {
     console.error("Error during seeding:", e);

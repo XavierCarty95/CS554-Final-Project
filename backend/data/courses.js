@@ -110,3 +110,19 @@ export const searchCourses = async (query) => {
     .sort({ score: { $meta: "textScore" } })
     .toArray();
 };
+
+export const getCoursesForUniversityDropdown = async (universityId) => {
+  if (!universityId || typeof universityId !== "string") {
+    throw new Error("Invalid university ID");
+  }
+  const coll = await getCoursesCollection();
+  const courses = await coll
+    .find({
+      universityId: ObjectId.isValid(universityId)
+        ? new ObjectId(universityId)
+        : universityId,
+    })
+    .project({ _id: 1, title: 1 }) // only return minimal info for dropdown
+    .toArray();
+  return courses;
+};

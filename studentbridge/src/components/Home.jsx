@@ -33,11 +33,18 @@ function Home() {
             Connect, Learn, and Thrive Together in Your Academic Journey
           </p>
           <NavLink
-            to="/signup"
-            className="btn-primary bg-white text-blue-600 hover:bg-gray-100"
-          >
-            Sign Up Now!!
-          </NavLink>
+  to="/signup"
+  className="px-6 py-3 bg-white text-blue-600 font-semibold rounded-xl shadow hover:bg-gray-100 transition"
+>
+  Sign Up Now
+</NavLink>
+<br />
+<NavLink
+  to="/scheduler"
+  className="inline-block mt-4 px-6 py-3 bg-white text-blue-600 font-semibold rounded-xl shadow hover:bg-gray-100 transition"
+>
+  🎓 Try Our Advanced Course Scheduler
+</NavLink>
         </div>
       </section>
 

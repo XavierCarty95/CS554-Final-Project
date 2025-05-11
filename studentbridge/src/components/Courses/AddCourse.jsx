@@ -1,15 +1,14 @@
-
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../config/axiosConfig";
 
 function AddCourse() {
-  const [title, setTitle] = useState("");
+  const [selectedCourseId, setSelectedCourseId] = useState("");
   const [description, setDescription] = useState("");
   const [universityId, setUniversityId] = useState("");
   const [user, setUser] = useState(null);
   const [error, setError] = useState("");
+  const [availableCourses, setAvailableCourses] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -18,6 +17,10 @@ function AddCourse() {
       .then((res) => {
         setUser(res.data);
         setUniversityId(res.data.universityId);
+        axiosInstance
+          .get(`/courses/university/${res.data.universityId}/dropdown`)
+          .then((res) => setAvailableCourses(res.data))
+          .catch(() => console.warn("Failed to load available courses"));
       })
       .catch(() => {
         setError("You must be logged in to add a course.");
@@ -26,15 +29,21 @@ function AddCourse() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!title || !description || !universityId || !user?._id) {
+    if (!selectedCourseId || !universityId || !user?._id) {
       setError("All fields are required.");
+      return;
+    }
+
+    const selectedCourse = availableCourses.find(c => c._id === selectedCourseId);
+    if (!selectedCourse) {
+      setError("Selected course is invalid.");
       return;
     }
 
     try {
       const res = await axiosInstance.post("/courses", {
-        title,
-        description,
+        title: selectedCourse.title,
+        description: selectedCourse.description,
         universityId,
         professorId: user._id,
       });
@@ -54,24 +63,21 @@ function AddCourse() {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block mb-1 font-medium">Course Title</label>
-          <input
+          <select
             className="w-full border p-2 rounded"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Enter course title"
+            value={selectedCourseId}
+            onChange={(e) => setSelectedCourseId(e.target.value)}
             required
-          />
+          >
+            <option value="">Select a course</option>
+            {availableCourses.map((course) => (
+              <option key={course._id} value={course._id}>
+                {course.title}
+              </option>
+            ))}
+          </select>
         </div>
-        <div>
-          <label className="block mb-1 font-medium">Course Description</label>
-          <textarea
-            className="w-full border p-2 rounded"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Enter course description"
-            required
-          />
-        </div>
+
         <button
           type="submit"
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"

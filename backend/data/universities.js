@@ -45,3 +45,17 @@ export const getUniversityDropdown = async () => {
     .toArray();
   return universities;
 };
+
+
+export const getRequiredCoursesForMajor = async (universityId, major) => {
+  const universitiesCollection = await getUniversitiesCollection();
+  const university = await universitiesCollection.findOne({ _id: new ObjectId(universityId) });
+
+  if (!university || !university.requiredCourses) {
+    throw new Error("Required courses not found");
+  }
+
+  return university.requiredCourses.filter(
+    (course) => course.major === major
+  );
+};
