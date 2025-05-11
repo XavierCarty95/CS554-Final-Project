@@ -15,13 +15,13 @@ export const initializeSocket = (httpServer) => {
     });
 
     socket.on("chatMessage", async (data) => {
-      console.log(data);
       const chatCol = await chats();
       await chatCol.findOneAndUpdate(
         { _id: new ObjectId(data.chatId) },
         {
           $push: {
             messages: {
+              senderId: data.senderId,
               name: data.name,
               message: data.message,
               createdAt: new Date(),

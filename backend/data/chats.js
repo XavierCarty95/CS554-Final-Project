@@ -165,3 +165,19 @@ export const getPublicChat = async (universityId) => {
   }
   return chatCol;
 };
+
+export const isChatExists = async (senderId, receipentId) => {
+  isValidId(senderId, "senderId");
+  isValidId(receipentId, "receipentId");
+  let ids = [senderId, receipentId];
+  const chatCollection = await chats();
+  const chat = await chatCollection.findOne({
+    members: { $all: ids },
+    type: "personal",
+  });
+  console.log(chat);
+  if (!chat) {
+    return false;
+  }
+  return true;
+};

@@ -120,37 +120,102 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route path="/university" element={<UniversitySelection />} />
+        <Route
+          path="/university"
+          element={
+            <ProtectedRoute
+              isLoggedIn={isLoggedIn}
+              setIsLoggedIn={setIsLoggedIn}
+              setCurrentUser={setCurrentUser}
+            >
+              <UniversitySelection />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/university/:universityId"
-          element={<UniversityProfile />}
+          element={
+            <ProtectedRoute
+              isLoggedIn={isLoggedIn}
+              setIsLoggedIn={setIsLoggedIn}
+              setCurrentUser={setCurrentUser}
+            >
+              <UniversityProfile />
+            </ProtectedRoute>
+          }
         />
         <Route
           path="/university/:universityId/professors"
-          element={<ProfessorsPage />}
+          element={
+            <ProtectedRoute
+              isLoggedIn={isLoggedIn}
+              setIsLoggedIn={setIsLoggedIn}
+              setCurrentUser={setCurrentUser}
+            >
+              <ProfessorsPage />
+            </ProtectedRoute>
+          }
         />
         <Route
           path="/university/:universityId/professors/:professorId"
-          element={<ProfessorDetailPage />}
-        />
-        <Route
-          path="/university/:universityId/professors"
-          element={<ProfessorsPage />}
-        />
-        <Route
-          path="/university/:universityId/professors/:professorId"
-          element={<ProfessorDetailPage />}
+          element={
+            <ProtectedRoute
+              isLoggedIn={isLoggedIn}
+              setIsLoggedIn={setIsLoggedIn}
+              setCurrentUser={setCurrentUser}
+            >
+              <ProfessorDetailPage />
+            </ProtectedRoute>
+          }
         />
         <Route
           path="/university/:universityId/forums"
-          element={<ForumPage />}
+          element={
+            <ProtectedRoute
+              isLoggedIn={isLoggedIn}
+              setIsLoggedIn={setIsLoggedIn}
+              setCurrentUser={setCurrentUser}
+            >
+              <ForumPage />
+            </ProtectedRoute>
+          }
         />
         <Route
           path="/university/:universityId/forums/:forumId"
-          element={<ThreadDetailPage />}
+          element={
+            <ProtectedRoute
+              isLoggedIn={isLoggedIn}
+              setIsLoggedIn={setIsLoggedIn}
+              setCurrentUser={setCurrentUser}
+            >
+              <ThreadDetailPage />
+            </ProtectedRoute>
+          }
         />
-        <Route path="/courses" element={<CourseList />} />
-        <Route path="/courses/:courseId" element={<CourseDetail />} />
+        <Route
+          path="/courses"
+          element={
+            <ProtectedRoute
+              isLoggedIn={isLoggedIn}
+              setIsLoggedIn={setIsLoggedIn}
+              setCurrentUser={setCurrentUser}
+            >
+              <CourseList />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/courses/:courseId"
+          element={
+            <ProtectedRoute
+              isLoggedIn={isLoggedIn}
+              setIsLoggedIn={setIsLoggedIn}
+              setCurrentUser={setCurrentUser}
+            >
+              <CourseDetail />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/about" element={<About />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/contact" element={<Contact />} />
@@ -163,7 +228,18 @@ function App() {
             />
           }
         />
-        <Route path="/profile/:userId" element={<Profile />} />
+        <Route
+          path="/profile/:userId"
+          element={
+            <ProtectedRoute
+              isLoggedIn={isLoggedIn}
+              setIsLoggedIn={setIsLoggedIn}
+              setCurrentUser={setCurrentUser}
+            >
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/chats"
           element={

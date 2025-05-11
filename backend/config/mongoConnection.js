@@ -8,7 +8,6 @@ let _db = undefined;
 const client = new MongoClient(mongoConfig.serverUrl, {
   serverApi: {
     version: ServerApiVersion.v1,
-    strict: true,
     deprecationErrors: true,
   },
 });

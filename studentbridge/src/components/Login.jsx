@@ -16,7 +16,6 @@ const Login = (props) => {
     await axiosInstance
       .post("/login", { email, password })
       .then(() => {
-        alert("Login successful! Redirecting to dashboard...");
         props.setIsLoggedIn(true);
         Navigate("/dashboard", { replace: true });
       })
