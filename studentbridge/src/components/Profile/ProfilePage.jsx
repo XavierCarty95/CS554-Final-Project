@@ -6,6 +6,7 @@ import {
   getUserForumActivity,
   getUserPostActivity,
 } from "../../services/userActivityServices";
+import { getCoursesByProfessor } from "../../services/courseServices";
 import axiosInstance from "../../config/axiosConfig";
 import RequestChat from "../chats/RequestChat.jsx";
 
@@ -22,6 +23,7 @@ export default function ProfilePage() {
   const [posts, setPosts] = useState([]);
   const [activityLoading, setActivityLoading] = useState(true);
   const [chatExists, setChatExists] = useState(false);
+  const [courses, setCourses] = useState([]);
 
   useEffect(() => {
     setIsLoading(true);
@@ -53,9 +55,23 @@ export default function ProfilePage() {
         });
     }
 
+    if (profileUser?.role === "professor") {
+      console.log(
+        "Checking if current user is same as professor:",
+        currentUser?._id === profileUser._id,
+        "Current:",
+        currentUser?._id,
+        "Profile:",
+        profileUser._id
+      );
+      getCoursesByProfessor(profileUser._id)
+        .then((data) => setCourses(data))
+        .catch((err) => console.error("Error loading courses:", err));
+    }
+
     console.log("Profile User:", profileUser);
     console.log("universityName:", universityName);
-  }, [profileUser]);
+  }, [profileUser, currentUser]);
 
   // Fetch user activity
   useEffect(() => {
@@ -120,6 +136,16 @@ export default function ProfilePage() {
       month: "short",
       day: "numeric",
     });
+  };
+
+  // Handle deleting a course (professor only)
+  const handleDeleteCourse = async (courseId) => {
+    try {
+      await axiosInstance.delete(`/courses/${courseId}`);
+      setCourses(prev => prev.filter(c => c._id !== courseId));
+    } catch (err) {
+      console.error("Failed to delete course", err);
+    }
   };
 
   return (
@@ -230,6 +256,38 @@ export default function ProfilePage() {
         <div className="md:col-span-2">
           <div className="bg-white rounded-lg shadow-md p-6">
             <h2 className="text-xl font-semibold mb-4">User Activity</h2>
+
+            {profileUser.role === "professor"  && (
+              <div className="mb-6">
+                <h3 className="text-lg font-medium mb-3">Courses Taught</h3>
+               {currentUser && currentUser.role === "professor" && currentUser._id === profileUser._id && (
+                  <div className="mb-4">
+                    <Link
+                      to={`/add-course`}
+                      className="inline-block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
+                    >
+                      Add New Course
+                    </Link>
+                  </div>
+                )}
+                <ul className="space-y-2">
+                  {courses.map((course) => (
+                    <li key={course._id} className="border p-3 rounded bg-gray-100">
+                      <h4 className="font-semibold">{course.title}</h4>
+                      <p className="text-sm text-gray-700">{course.description}</p>
+                      {currentUser && currentUser.role === "professor" && currentUser._id === profileUser._id && (
+                        <button
+                          onClick={() => handleDeleteCourse(course._id)}
+                          className="text-red-600 text-sm ml-2 hover:underline"
+                        >
+                          Delete
+                        </button>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             {activityLoading ? (
               <div className="text-center p-4">Loading activity...</div>

@@ -87,6 +87,17 @@ export const createCourse = async ({
   return getCourseById(result.insertedId.toString());
 };
 
+export const deleteCourseById = async (id) => {
+  if (!id || typeof id !== "string") throw new Error("Invalid course ID");
+  const coll = await getCoursesCollection();
+  const objectId = ObjectId.isValid(id) ? new ObjectId(id) : id;
+  const result = await coll.deleteOne({ _id: objectId });
+  if (result.deletedCount === 0) {
+    throw new Error("Course not found or already deleted");
+  }
+  return true;
+};
+
 export const searchCourses = async (query) => {
   if (!query || typeof query !== "string")
     throw new Error("Search query must be a non-empty string");

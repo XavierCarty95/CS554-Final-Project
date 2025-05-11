@@ -22,6 +22,7 @@ import Profile from "./components/Profile/ProfilePage";
 import Chats from "./components/chats/Chats.jsx";
 import CourseList from "./components/Courses/CourseList";
 import CourseDetail from "./components/Courses/CourseDetail";
+import AddCourse from "./components/Courses/AddCourse";
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
@@ -192,30 +193,8 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/courses"
-          element={
-            <ProtectedRoute
-              isLoggedIn={isLoggedIn}
-              setIsLoggedIn={setIsLoggedIn}
-              setCurrentUser={setCurrentUser}
-            >
-              <CourseList />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/courses/:courseId"
-          element={
-            <ProtectedRoute
-              isLoggedIn={isLoggedIn}
-              setIsLoggedIn={setIsLoggedIn}
-              setCurrentUser={setCurrentUser}
-            >
-              <CourseDetail />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/courses" element={<CourseList />} />
+        <Route path="/courses/:courseId" element={<CourseDetail />} />
         <Route path="/about" element={<About />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/contact" element={<Contact />} />

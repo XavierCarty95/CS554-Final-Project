@@ -5,6 +5,7 @@ import {
   getCoursesByUniversity,
   getCoursesByProfessor,
   createCourse,
+  deleteCourseById,
   searchCourses,
 } from "../data/courses.js";
 
@@ -89,6 +90,17 @@ router.post("/", async (req, res) => {
   } catch (err) {
     console.error("Error creating course:", err);
     res.status(400).json({ error: err.message || "Failed to create course" });
+  }
+});
+
+router.delete("/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    await deleteCourseById(id);
+    res.json({ message: "Course deleted successfully" });
+  } catch (err) {
+    console.error(`Error deleting course ${id}:`, err);
+    res.status(400).json({ error: err.message || "Failed to delete course" });
   }
 });
 

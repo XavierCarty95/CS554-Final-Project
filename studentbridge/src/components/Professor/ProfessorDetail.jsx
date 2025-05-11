@@ -11,12 +11,13 @@ function ProfessorDetailPage() {
   const [comment, setComment] = useState("");
   const [error, setError] = useState(null);
   const [userId, setUserId] = useState(null);
-  // eslint-disable-next-line no-unused-vars
   const [userName, setUserName] = useState("");
 
   const [editingReviewId, setEditingReviewId] = useState(null);
   const [editRating, setEditRating] = useState(5);
   const [editComment, setEditComment] = useState("");
+
+  const [professorCourses, setProfessorCourses] = useState([]);
 
   useEffect(() => {
     axiosInstance
@@ -27,12 +28,17 @@ function ProfessorDetailPage() {
       })
       .catch(() => setError("Failed to load professor data"));
 
-      axiosInstance
+    axiosInstance
+      .get(`/courses/professor/${professorId}`)
+      .then((res) => setProfessorCourses(res.data))
+      .catch(() => console.warn("Could not load professor's courses"));
+
+    axiosInstance
       .get(`/reviews/${professorId}`)
       .then((res) => setReviews(res.data))
       .catch(() => setError("Could not load reviews"));
 
-      axiosInstance
+    axiosInstance
       .get("/verify")
       .then((res) => {
         setUserId(res.data._id);
@@ -65,7 +71,7 @@ function ProfessorDetailPage() {
     try {
       const res = await axiosInstance.post("/reviews", {
         professorId,
-        userId: userId,
+        userId,
         rating: Number(rating),
         comment,
       });
@@ -73,7 +79,6 @@ function ProfessorDetailPage() {
       setComment("");
       setReviews((prev) => [...prev, res.data]);
     } catch (err) {
-      console.log(err.message);
       setError("Failed to submit review");
     }
   };
@@ -81,7 +86,7 @@ function ProfessorDetailPage() {
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axiosInstance.put(`/reviews/${editingReviewId}`, {
+      await axiosInstance.put(`/reviews/${editingReviewId}`, {
         rating: Number(editRating),
         comment: editComment,
       });
@@ -93,7 +98,7 @@ function ProfessorDetailPage() {
       setEditingReviewId(null);
       setEditRating(5);
       setEditComment("");
-    } catch (err) {
+    } catch {
       setError("Failed to edit review");
     }
   };
@@ -105,6 +110,8 @@ function ProfessorDetailPage() {
       ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
       : null;
 
+  const isProfessor = userId === professorId;
+
   return (
     <div className="max-w-3xl mx-auto p-4">
       <h2 className="text-2xl font-bold">{professor.name}</h2>
@@ -115,17 +122,12 @@ function ProfessorDetailPage() {
         </p>
       )}
 
+      {/* Reviews */}
       <h3 className="text-xl font-semibold mt-6 mb-2">Submit a Review</h3>
       <form onSubmit={handleSubmit} className="space-y-3">
-        <select
-          value={rating}
-          onChange={(e) => setRating(e.target.value)}
-          className="border p-2 rounded"
-        >
+        <select value={rating} onChange={(e) => setRating(e.target.value)} className="border p-2 rounded">
           {[1, 2, 3, 4, 5].map((n) => (
-            <option key={n} value={n}>
-              {n}
-            </option>
+            <option key={n} value={n}>{n}</option>
           ))}
         </select>
         <textarea
@@ -142,80 +144,63 @@ function ProfessorDetailPage() {
       </form>
 
       <h3 className="text-xl font-semibold mt-8 mb-2">Reviews</h3>
-      {reviews.length === 0 ? (
-        <p className="text-gray-500">No reviews yet.</p>
-      ) : (
-        <ul className="space-y-4">
-          {reviews.map((rev) => (
-            <li key={rev._id} className="border p-3 rounded bg-gray-50">
-              <p className="font-semibold text-yellow-700">
-                ⭐ {rev.rating} / 5
-              </p>
-              {editingReviewId === rev._id ? (
-                <form onSubmit={handleEditSubmit} className="space-y-2 mt-2">
-                  <select
-                    value={editRating}
-                    onChange={(e) => setEditRating(e.target.value)}
-                    className="border p-1 rounded"
-                  >
-                    {[1, 2, 3, 4, 5].map((n) => (
-                      <option key={n} value={n}>
-                        {n}
-                      </option>
-                    ))}
-                  </select>
-                  <textarea
-                    className="w-full border p-1 rounded"
-                    value={editComment}
-                    onChange={(e) => setEditComment(e.target.value)}
-                    required
-                  />
-                  <div className="flex gap-2">
-                    <button type="submit" className="text-green-600 hover:underline text-sm">
-                      Save
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setEditingReviewId(null)}
-                      className="text-gray-500 hover:underline text-sm"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </form>
-              ) : (
-                <p>{rev.comment}</p>
-              )}
-              {rev.createdAt && (
-                <p className="text-sm text-gray-500 mt-1">
-                  {rev.userName ? rev.userName + " • " : ""}
-                  {new Date(rev.createdAt).toLocaleDateString()}
-                </p>
-              )}
-              {rev.userId === userId && (
-                <div className="mt-2 flex gap-4">
-                  <button
-                    onClick={() => handleDelete(rev._id)}
-                    className="text-red-500 hover:underline text-sm"
-                  >
-                    Delete
-                  </button>
-                  <button
-                    onClick={() => {
-                      setEditingReviewId(rev._id);
-                      setEditRating(rev.rating);
-                      setEditComment(rev.comment);
-                    }}
-                    className="text-blue-500 hover:underline text-sm"
-                  >
-                    Edit
-                  </button>
+      <ul className="space-y-4">
+        {reviews.map((rev) => (
+          <li key={rev._id} className="border p-3 rounded bg-gray-50">
+            <p className="font-semibold text-yellow-700">⭐ {rev.rating} / 5</p>
+            {editingReviewId === rev._id ? (
+              <form onSubmit={handleEditSubmit} className="space-y-2 mt-2">
+                <select
+                  value={editRating}
+                  onChange={(e) => setEditRating(e.target.value)}
+                  className="border p-1 rounded"
+                >
+                  {[1, 2, 3, 4, 5].map((n) => (
+                    <option key={n} value={n}>{n}</option>
+                  ))}
+                </select>
+                <textarea
+                  className="w-full border p-1 rounded"
+                  value={editComment}
+                  onChange={(e) => setEditComment(e.target.value)}
+                  required
+                />
+                <div className="flex gap-2">
+                  <button type="submit" className="text-green-600 hover:underline text-sm">Save</button>
+                  <button type="button" onClick={() => setEditingReviewId(null)} className="text-gray-500 hover:underline text-sm">Cancel</button>
                 </div>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
+              </form>
+            ) : (
+              <p>{rev.comment}</p>
+            )}
+            <p className="text-sm text-gray-500 mt-1">
+              {rev.userName ? rev.userName + " • " : ""}
+              {new Date(rev.createdAt).toLocaleDateString()}
+            </p>
+            {rev.userId === userId && (
+              <div className="mt-2 flex gap-4">
+                <button onClick={() => handleDelete(rev._id)} className="text-red-500 hover:underline text-sm">Delete</button>
+                <button onClick={() => {
+                  setEditingReviewId(rev._id);
+                  setEditRating(rev.rating);
+                  setEditComment(rev.comment);
+                }} className="text-blue-500 hover:underline text-sm">Edit</button>
+              </div>
+            )}
+          </li>
+        ))}
+      </ul>
+
+      {/* Courses taught by this professor */}
+      <h3 className="text-xl font-semibold mt-8 mb-2">Courses Taught by {professor.name}</h3>
+      <ul className="space-y-4 mb-4">
+        {professorCourses.map((course) => (
+          <li key={course._id} className="border p-3 rounded bg-gray-100">
+            <h4 className="font-semibold">{course.title}</h4>
+            <p className="text-sm text-gray-700">{course.description}</p>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
