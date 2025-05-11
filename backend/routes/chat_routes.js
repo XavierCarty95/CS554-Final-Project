@@ -8,6 +8,7 @@ import {
   rejectChatRequest,
   listPersonalChats,
   getPublicChat,
+  isChatExists,
 } from "../data/chats.js";
 const router = express.Router();
 
@@ -81,4 +82,13 @@ router.get("/getPublicChat/:uniId", ensureAuthenticated, async (req, res) => {
   }
 });
 
+router.post("/chatexists", ensureAuthenticated, async (req, res) => {
+  const { senderId, receipentId } = req.body;
+  try {
+    const chatExists = await isChatExists(senderId, receipentId);
+    return res.status(200).json(chatExists);
+  } catch (e) {
+    return res.status(400).json({ error: e.message });
+  }
+});
 export default router;

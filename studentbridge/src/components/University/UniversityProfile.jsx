@@ -1,6 +1,6 @@
 // src/components/University/UniversityProfile.jsx
 import React, { useState, useEffect, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import axiosInstance from "../../config/axiosConfig";
 import io from "socket.io-client";
 
@@ -27,6 +27,7 @@ const UniversityProfile = () => {
           setState((prevState) => ({
             ...prevState,
             name: response.data.name || "You",
+            senderId: response.data._id,
           }));
         }
       } catch (error) {
@@ -57,27 +58,23 @@ const UniversityProfile = () => {
   useEffect(() => {
     socketRef.current = io("http://localhost:3000");
 
-    // Emit a "join" event for the specific university chat room
     socketRef.current.emit("user_join", publicChatId);
 
-    // Define the chat message handler
-    const handleChatMessage = ({ name, message, chatId }) => {
+    const handleChatMessage = ({ name, message, chatId, senderId }) => {
       if (chatId === publicChatId) {
         setChats((prevChats) => ({
           ...prevChats,
-          [chatId]: [...(prevChats[chatId] || []), { name, message }],
+          [chatId]: [...(prevChats[chatId] || []), { name, message, senderId }],
         }));
       }
     };
 
-    // Register the listener
     socketRef.current.on("chatMessage", handleChatMessage);
 
-    // Cleanup: Remove the listener and disconnect the socket
     return () => {
-      socketRef.current.off("chatMessage", handleChatMessage); // Remove the listener
-      socketRef.current.emit("leave", publicChatId); // Emit leave event
-      socketRef.current.disconnect(); // Disconnect the socket
+      socketRef.current.off("chatMessage", handleChatMessage);
+      socketRef.current.emit("leave", publicChatId);
+      socketRef.current.disconnect();
     };
   }, [publicChatId]);
 
@@ -160,7 +157,9 @@ const UniversityProfile = () => {
           >
             {(chats[publicChatId] || []).map((msg, index) => (
               <div key={index} className="mb-2">
-                <strong>{msg.name}: </strong>
+                <Link to={`/profile/${msg.senderId}`}>
+                  <strong>{msg.name}: </strong>
+                </Link>
                 {msg.message}
               </div>
             ))}
@@ -175,6 +174,7 @@ const UniversityProfile = () => {
                     name: state.name,
                     message: state.message,
                     chatId: publicChatId,
+                    senderId: state.senderId,
                   };
                   socketRef.current.emit("chatMessage", newMessage);
                   setState((prevState) => ({ ...prevState, message: "" }));
@@ -193,7 +193,6 @@ const UniversityProfile = () => {
                 }
                 placeholder="Type a message..."
                 className="flex-1 border rounded px-4 py-2 focus:ring focus:ring-blue-300"
-                autoFocus
               />
               <button
                 type="submit"

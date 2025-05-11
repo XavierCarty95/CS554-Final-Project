@@ -21,6 +21,7 @@ export default function ProfilePage() {
   const [forums, setForums] = useState([]);
   const [posts, setPosts] = useState([]);
   const [activityLoading, setActivityLoading] = useState(true);
+  const [chatExists, setChatExists] = useState(false);
 
   useEffect(() => {
     setIsLoading(true);
@@ -45,9 +46,11 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (profileUser?.universityId) {
-      axiosInstance.get(`/universities/${profileUser.universityId}`).then((res) => {
-        setUniversityName(res.data.name);
-      });
+      axiosInstance
+        .get(`/universities/${profileUser.universityId}`)
+        .then((res) => {
+          setUniversityName(res.data.name);
+        });
     }
 
     console.log("Profile User:", profileUser);
@@ -91,6 +94,23 @@ export default function ProfilePage() {
   if (!profileUser) return null;
 
   const isOwnProfile = currentUser && currentUser._id === profileUser._id;
+
+  const checkChatExists = async () => {
+    try {
+      const response = await axiosInstance.post("/chat/chatexists", {
+        senderId: currentUser._id,
+        receipentId: profileUser._id,
+      });
+      if (response.data) {
+        setChatExists(response.data);
+      } else {
+        setChatExists(false);
+        setShowRequestChat(true);
+      }
+    } catch (error) {
+      console.error("Error checking chat existence:", error);
+    }
+  };
 
   // Format date for display
   const formatDate = (dateString) => {
@@ -138,13 +158,27 @@ export default function ProfilePage() {
                 Edit Profile
               </button>
             ) : (
-              <button
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-                onClick={() => setShowRequestChat(true)}
-              >
-                Message
-              </button>
+              <>
+                {chatExists ? (
+                  <Link
+                    to={`/chats`}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+                  >
+                    Chat
+                  </Link>
+                ) : (
+                  <button
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+                    onClick={() => {
+                      checkChatExists();
+                    }}
+                  >
+                    Message
+                  </button>
+                )}
+              </>
             )}
+
             {showRequestChat && (
               <RequestChat
                 senderId={currentUser._id}
