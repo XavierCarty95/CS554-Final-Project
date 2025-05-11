@@ -52,6 +52,10 @@ function ProfessorDetailPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (userId === professorId) {
+      setError("You cannot review your own profile.");
+      return;
+    }
     const userReviews = reviews.filter((r) => r.userId === userId);
     if (userReviews.length >= 2) {
       setError("You can only post up to 2 reviews.");

@@ -68,6 +68,7 @@ export const createUser = async (email, password, name, role, universityId) => {
     if (role === "professor") {
       const professorsCollection = await professors();
       const professorDoc = {
+        _id: newUser.insertedId,
         name,
         department: "",
         universityId: new ObjectId(universityId),
