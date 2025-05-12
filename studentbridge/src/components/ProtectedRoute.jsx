@@ -3,14 +3,16 @@ import axiosInstance from "../config/axiosConfig";
 import { useState, useEffect } from "react";
 
 const ProtectedRoute = (props) => {
-
   const { children } = props;
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
     const verifyLogin = async () => {
       try {
         const response = await axiosInstance.get("/verify");
         if (response.status === 200) {
           props.setIsLoggedIn(true);
+          props.setCurrentUser(response.data);
         } else {
           props.setIsLoggedIn(false);
           props.setCurrentUser(null);
@@ -18,26 +20,21 @@ const ProtectedRoute = (props) => {
       } catch {
         props.setIsLoggedIn(false);
         props.setCurrentUser(null);
+      } finally {
+        setIsLoading(false);
       }
     };
     verifyLogin();
   }, []);
-  if (props.isLoggedIn === null) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-100">
-        Loading...
-      </div>
-    );
+
+  if (isLoading) {
+    return <div>Loading...</div>;
   }
+
   if (!props.isLoggedIn) {
-    return (
-      <div className="card">
-        <h2>You are not logged in!</h2>
-        <p>Please log in to access this page.</p>
-        <Navigate to="/login" />
-      </div>
-    );
+    return <Navigate to="/login" />;
   }
+
   return children;
 };
 

@@ -1,61 +1,102 @@
+import {
+  professors,
+  reviews,
+  universities,
+  courses,
+} from "../config/mongoCollections.js";
+import { ObjectId } from "mongodb";
 
-import express from 'express';
-import { universities, professors } from '../config/mongoCollections.js';
-import { ObjectId } from 'mongodb';
+export const getProfessorsByUniversity = async (universityId) => {
+  if (!universityId || typeof universityId !== "string") {
+    throw new Error("Valid university ID is required");
+  }
 
-const router = express.Router();
+  try {
+    const professorsCollection = await professors();
+    const uniId = ObjectId.isValid(universityId)
+      ? new ObjectId(universityId)
+      : universityId;
 
-router.get('/byUniversity/:universityId', async (req, res) => {
-    const { universityId } = req.params;
-    console.log('Received request for university ID:', universityId);
+    const professorsList = await professorsCollection
+      .find({ universityId: uniId })
+      .toArray();
 
-    if (!ObjectId.isValid(universityId)) {
-      console.error('Invalid ObjectId');
-      return res.status(400).json({ error: 'Invalid university ID' });
+    return professorsList;
+  } catch (error) {
+    console.error("Error getting professors by university:", error);
+    throw error;
+  }
+};
+
+export const getProfessorById = async (professorId) => {
+  if (!professorId || typeof professorId !== "string") {
+    throw new Error("Valid professor ID is required");
+  }
+
+  try {
+    const professorsCollection = await professors();
+    const profId = ObjectId.isValid(professorId)
+      ? new ObjectId(professorId)
+      : professorId;
+
+    const professor = await professorsCollection.findOne({ _id: profId });
+    if (!professor) {
+      throw new Error("Professor not found");
     }
 
-    try {
-      const universityCollection = await universities();
-      const professorCollection = await professors();
+    return professor;
+  } catch (error) {
+    console.error("Error getting professor by ID:", error);
+    throw error;
+  }
+};
 
-      const university = await universityCollection.findOne({ _id: new ObjectId(universityId) });
+export const getProfessorWithCourses = async (professorId) => {
+  if (!professorId || typeof professorId !== "string") {
+    throw new Error("Valid professor ID is required");
+  }
 
-      if (!university) {
-        console.error('University not found');
-        return res.status(404).json({ error: 'University not found' });
-      }
+  try {
+    const professor = await getProfessorById(professorId);
 
-      const professorIds = university.professors || [];
+    const coursesCollection = await courses();
+    const courseIds = professor.courses.map((id) =>
+      ObjectId.isValid(id) ? new ObjectId(id) : id
+    );
 
-      const profDocs = await professorCollection
-        .find({ _id: { $in: professorIds.map(id => new ObjectId(id)) } })
-        .toArray();
+    const courseDetails = await coursesCollection
+      .find({ _id: { $in: courseIds } })
+      .toArray();
 
-      return res.json(profDocs);
-    } catch (e) {
-      console.error('Error in /byUniversity/:universityId route:', e);
-      return res.status(500).json({ error: e.message });
-    }
-  });
+    return {
+      ...professor,
+      courseDetails,
+    };
+  } catch (error) {
+    console.error("Error getting professor with courses:", error);
+    throw error;
+  }
+};
 
-  router.post('/:id/review', async (req, res) => {
-    const professorId = req.params.id;
-    const { reviewerName, comment, score } = req.body;
-  
-    if (!reviewerName || !comment || typeof score !== 'number') {
-      return res.status(400).json({ error: "Invalid review input" });
-    }
-  
-    try {
-      const result = await professorsCollection.updateOne(
-        { _id: new ObjectId(professorId) },
-        { $push: { reviews: { reviewerName, comment, score } } }
-      );
-      if (result.modifiedCount === 0) throw "Review not added";
-      res.status(200).json({ success: true });
-    } catch (e) {
-      res.status(500).json({ error: e.toString() });
-    }
-  });
+export const getProfessorWithRatings = async (professorId) => {
+  if (!professorId || typeof professorId !== "string") {
+    throw new Error("Valid professor ID is required");
+  }
 
-export default router;
+  try {
+    const professor = await getProfessorById(professorId);
+
+    const reviewsCollection = await reviews();
+    const professorReviews = await reviewsCollection
+      .find({ professorId })
+      .toArray();
+
+    return {
+      ...professor,
+      ratings: professorReviews,
+    };
+  } catch (error) {
+    console.error("Error getting professor with ratings:", error);
+    throw error;
+  }
+};

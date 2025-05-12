@@ -8,7 +8,6 @@ const newUniversities = [
     location: "San Francisco, CA",
     overview: "Focused on innovation and software engineering.",
     requiredCourses: [
-      // Computer Science (8+8=16 courses)
       { title: "Introduction to Programming", semesterOffered: "Fall", yearRecommended: 1, major: "Computer Science" },
       { title: "CS Foundations Lab", semesterOffered: "Fall", yearRecommended: 1, major: "Computer Science" },
       { title: "Mathematical Foundations for CS", semesterOffered: "Fall", yearRecommended: 1, major: "Computer Science" },
@@ -33,7 +32,6 @@ const newUniversities = [
       { title: "Artificial Intelligence", semesterOffered: "Spring", yearRecommended: 4, major: "Computer Science" },
       { title: "Capstone Project II", semesterOffered: "Spring", yearRecommended: 4, major: "Computer Science" },
       { title: "Human-Computer Interaction", semesterOffered: "Spring", yearRecommended: 4, major: "Computer Science" },
-      // Biology (8+8=16 courses)
       { title: "General Biology I", semesterOffered: "Fall", yearRecommended: 1, major: "Biology" },
       { title: "Biology Lab Skills I", semesterOffered: "Fall", yearRecommended: 1, major: "Biology" },
       { title: "Chemistry for Biologists", semesterOffered: "Fall", yearRecommended: 1, major: "Biology" },
@@ -65,7 +63,6 @@ const newUniversities = [
     location: "New York, NY",
     overview: "Leading business school with a global perspective.",
     requiredCourses: [
-      // Business (8+8=16 courses)
       { title: "Introduction to Business", semesterOffered: "Fall", yearRecommended: 1, major: "Business" },
       { title: "Business Communication", semesterOffered: "Fall", yearRecommended: 1, major: "Business" },
       { title: "Spreadsheet Fundamentals", semesterOffered: "Fall", yearRecommended: 1, major: "Business" },
@@ -90,7 +87,6 @@ const newUniversities = [
       { title: "Strategic Management", semesterOffered: "Spring", yearRecommended: 4, major: "Business" },
       { title: "Capstone Project: Business", semesterOffered: "Spring", yearRecommended: 4, major: "Business" },
       { title: "Business Consulting", semesterOffered: "Spring", yearRecommended: 4, major: "Business" },
-      // Psychology (8+8=16 courses)
       { title: "Introduction to Psychology", semesterOffered: "Fall", yearRecommended: 1, major: "Psychology" },
       { title: "Psychology Writing Lab", semesterOffered: "Fall", yearRecommended: 1, major: "Psychology" },
       { title: "Introduction to Statistics", semesterOffered: "Fall", yearRecommended: 1, major: "Psychology" },
@@ -120,12 +116,10 @@ const newUniversities = [
 ];
 
 const newProfessors = [
-  // Pacific Tech University
   { name: "Dr. Alice Winters", department: "Computer Science", universityName: "Pacific Tech University" },
   { name: "Dr. Ethan Brown", department: "Computer Science", universityName: "Pacific Tech University" },
   { name: "Dr. Maria Gonzalez", department: "Biology", universityName: "Pacific Tech University" },
   { name: "Dr. Samuel Lee", department: "Biology", universityName: "Pacific Tech University" },
-  // Global Business Institute
   { name: "Dr. Susan Lee", department: "Business", universityName: "Global Business Institute" },
   { name: "Dr. Michael Chen", department: "Business Analytics", universityName: "Global Business Institute" },
   { name: "Dr. Olivia Davis", department: "Business", universityName: "Global Business Institute" },
@@ -135,7 +129,6 @@ const newProfessors = [
 ];
 
 const newCourses = [
-  // Additional Computer Science courses @ Pacific Tech University
   {
     title: "CS Foundations Lab",
     description: "Hands-on lab accompanying introductory programming.",
@@ -281,7 +274,6 @@ const newCourses = [
     yearRecommended: 4
   },
 
-  // Additional Biology courses @ Pacific Tech University
   {
     title: "Biology Lab Skills I",
     description: "Introduction to essential laboratory skills in biology.",
@@ -427,7 +419,6 @@ const newCourses = [
     yearRecommended: 4
   },
 
-  // Additional Business courses @ Global Business Institute
   {
     title: "Business Communication",
     description: "Principles and practice of effective business communication.",
@@ -573,7 +564,6 @@ const newCourses = [
     yearRecommended: 4
   },
 
-  // Additional Psychology courses @ Global Business Institute
   {
     title: "Psychology Writing Lab",
     description: "Development of writing skills for psychology.",
@@ -718,7 +708,6 @@ const newCourses = [
     semesterOffered: "Spring",
     yearRecommended: 4
   },
-  // Computer Science @ Pacific Tech University
   {
     title: "Introduction to Programming",
     description: "Learn programming basics using Python and Java.",
@@ -791,7 +780,6 @@ const newCourses = [
     semesterOffered: "Spring",
     yearRecommended: 4
   },
-  // Biology @ Pacific Tech University
   {
     title: "General Biology I",
     description: "Cell structure, function, and genetics.",
@@ -864,7 +852,6 @@ const newCourses = [
     semesterOffered: "Spring",
     yearRecommended: 4
   },
-  // Business @ Global Business Institute
   {
     title: "Introduction to Business",
     description: "Fundamentals of business principles and practices.",
@@ -937,7 +924,6 @@ const newCourses = [
     semesterOffered: "Spring",
     yearRecommended: 4
   },
-  // Psychology @ Global Business Institute
   {
     title: "Introduction to Psychology",
     description: "Overview of psychological principles and theories.",
@@ -1017,7 +1003,7 @@ function generateCourseCode(major, index) {
     .split(' ')
     .map(word => word[0].toUpperCase())
     .join('');
-  return `${prefix}${500 + index}`; // e.g., CS501, BIO502
+  return `${prefix}${500 + index}`;
 }
 
 const run = async () => {
@@ -1025,7 +1011,6 @@ const run = async () => {
   const professorsCol = await professors();
   const coursesCol = await courses();
 
-  // Assign code to each requiredCourse using generateCourseCode
   let courseIndex = 0;
   for (const uni of newUniversities) {
     for (const course of uni.requiredCourses) {
@@ -1033,7 +1018,7 @@ const run = async () => {
     }
   }
 
-  const uniMap = {}; // name -> _id
+  const uniMap = {};
 
   for (const uni of newUniversities) {
     let existing = await universitiesCol.findOne({ name: uni.name });

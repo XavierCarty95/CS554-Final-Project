@@ -122,19 +122,16 @@ export default function ProfilePage() {
     } catch (err) {
       console.error("Error updating profile:", err);
       if (err.response) {
-        // Server responded with a status code outside 2xx
         alert(
           `Failed to update profile: ${
             err.response.data.error || "Unknown server error"
           }`
         );
       } else if (err.request) {
-        // No response received from server
         alert(
           "Failed to update profile: No response from server. Please check your connection."
         );
       } else {
-        // Other errors (e.g., request setup)
         alert(`Failed to update profile: ${err.message}`);
       }
     }
@@ -246,6 +243,7 @@ export default function ProfilePage() {
                     onChange={handleInputChange}
                     className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-300"
                     required
+                    readOnly
                   />
                 </div>
                 {profileUser.role === "student" && (

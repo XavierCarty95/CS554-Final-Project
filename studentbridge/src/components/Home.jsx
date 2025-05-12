@@ -1,5 +1,6 @@
 import React from "react";
 import SearchBar from "./SearchBar";
+import "../App.css";
 import { NavLink } from "react-router-dom";
 import { University, MessageCircle, Calendar, Star } from "lucide-react";
 
@@ -33,18 +34,18 @@ function Home() {
             Connect, Learn, and Thrive Together in Your Academic Journey
           </p>
           <NavLink
-  to="/signup"
-  className="px-6 py-3 bg-white text-blue-600 font-semibold rounded-xl shadow hover:bg-gray-100 transition"
->
-  Sign Up Now
-</NavLink>
-<br />
-<NavLink
-  to="/scheduler"
-  className="inline-block mt-4 px-6 py-3 bg-white text-blue-600 font-semibold rounded-xl shadow hover:bg-gray-100 transition"
->
-  🎓 Try Our Advanced Course Scheduler
-</NavLink>
+            to="/signup"
+            className="px-6 py-3 bg-white text-blue-600 font-semibold rounded-xl shadow hover:bg-gray-100 transition"
+          >
+            Sign Up Now
+          </NavLink>
+          <br />
+          <NavLink
+            to="/scheduler"
+            className="inline-block mt-4 px-6 py-3 bg-white text-blue-600 font-semibold rounded-xl shadow hover:bg-gray-100 transition"
+          >
+            🎓 Try Our Advanced Course Scheduler
+          </NavLink>
         </div>
       </section>
 

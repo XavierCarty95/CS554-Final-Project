@@ -19,7 +19,9 @@ function Signup(props) {
   useEffect(() => {
     const fetchUniversities = async () => {
       try {
-        const response = await axiosInstance.get("/universities/getUniversityDropdown");
+        const response = await axiosInstance.get(
+          "/universities/getUniversityDropdown"
+        );
         setUniversities(response.data);
       } catch (error) {
         console.error("Error fetching universities:", error);
@@ -65,7 +67,7 @@ function Signup(props) {
         navigate("/dashboard", { replace: true });
       })
       .catch((error) => {
-        console.log(error.response)
+        console.log(error.response);
         console.error("Signup failed:", error.response?.data || error.message);
         setErrorMessage("Signup failed: " + error.response?.data.error);
       });
@@ -150,7 +152,7 @@ function Signup(props) {
               </option>
               <option value="student">Student</option>
               <option value="incoming">Incoming Student</option>
-              <option value="professor">Professor</option>
+              {/* <option value="professor">Professor</option> */}
             </select>
           </div>
           {formData.role === "student" || formData.role === "professor" ? (

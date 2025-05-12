@@ -1,31 +1,40 @@
-// DO not run seed2.js directly. It is used to seed the database with initial data. only run if you want to make changes to the database. also be advised to clear the older data first before running it to add new data.
-// This scripts seeds only the universities, professors, and courses collections.
-
+// seed2.js
 import {
   universities,
   professors,
   courses,
 } from "./config/mongoCollections.js";
-// import { dbConnection } from "./config/mongoConnection.js";
 import { ObjectId } from "mongodb";
-import firebaseApp from "./config/firebase.js";
 
 async function main() {
   try {
-    // Get database connection and clear old data
-    const db = await import("./config/mongoConnection.js").then(m => m.dbConnection());
-    await db.collection("universities").deleteMany({});
-    await db.collection("professors").deleteMany({});
-    await db.collection("courses").deleteMany({});
+    const db = await import("./config/mongoConnection.js").then((m) =>
+      m.dbConnection()
+    );
+
+    const collectionsToClear = [
+      "universities",
+      "professors",
+      "courses",
+      "reviews",
+      "forums",
+      "posts",
+      "chats",
+      "chatrequests",
+    ];
+
+    console.log("Clearing existing collections (preserving users)...");
+    for (const collection of collectionsToClear) {
+      await db.collection(collection).deleteMany({});
+      console.log(`Cleared ${collection} collection`);
+    }
+
     const universitiesCollection = await universities();
     const professorsCollection = await professors();
-
-    // Get database connection for courses (since it might not be in mongoCollections.js)
     const coursesCollection = await courses();
 
     console.log("Starting to seed universities, professors, and courses...");
 
-    // Create universities
     console.log("Creating universities...");
     const universityData = [
       {
@@ -33,12 +42,8 @@ async function main() {
         location: "Boston, MA",
         overview:
           "A leading technology-focused university with strong computer science programs.",
-        courses: [
-          "Introduction to AI",
-          "Advanced Data Structures",
-          "Mobile App Development",
-        ],
-        professors: [],
+        courses: [],
+        professors: [], 
         publicChatId: new ObjectId().toString(),
       },
       {
@@ -46,7 +51,7 @@ async function main() {
         location: "San Diego, CA",
         overview:
           "A research university known for marine biology and environmental science programs.",
-        courses: ["Marine Ecosystems", "Environmental Policy", "Oceanography"],
+        courses: [],
         professors: [],
         publicChatId: new ObjectId().toString(),
       },
@@ -55,11 +60,7 @@ async function main() {
         location: "Chicago, IL",
         overview:
           "A liberal arts college with strong humanities and business programs.",
-        courses: [
-          "Business Ethics",
-          "Modern Literature",
-          "Financial Accounting",
-        ],
+        courses: [],
         professors: [],
         publicChatId: new ObjectId().toString(),
       },
@@ -68,11 +69,61 @@ async function main() {
         location: "Denver, CO",
         overview:
           "Known for environmental science, geology, and outdoor recreation programs.",
-        courses: [
-          "Geology 101",
-          "Sustainable Development",
-          "Outdoor Leadership",
-        ],
+        courses: [],
+        professors: [],
+        publicChatId: new ObjectId().toString(),
+      },
+      {
+        name: "Bay Area University",
+        location: "San Francisco, CA",
+        overview:
+          "Renowned for innovation and technology entrepreneurship programs.",
+        courses: [],
+        professors: [],
+        publicChatId: new ObjectId().toString(),
+      },
+      {
+        name: "Atlantic College",
+        location: "New York, NY",
+        overview:
+          "Prestigious institution with strong programs in finance and business.",
+        courses: [],
+        professors: [],
+        publicChatId: new ObjectId().toString(),
+      },
+      {
+        name: "Southern State University",
+        location: "Atlanta, GA",
+        overview:
+          "Known for medical research and healthcare education programs.",
+        courses: [],
+        professors: [],
+        publicChatId: new ObjectId().toString(),
+      },
+      {
+        name: "Pacific Northwest University",
+        location: "Seattle, WA",
+        overview:
+          "Leading institution for environmental science and sustainable development.",
+        courses: [],
+        professors: [],
+        publicChatId: new ObjectId().toString(),
+      },
+      {
+        name: "Great Lakes College",
+        location: "Detroit, MI",
+        overview:
+          "Focused on engineering and automotive technology innovation.",
+        courses: [],
+        professors: [],
+        publicChatId: new ObjectId().toString(),
+      },
+      {
+        name: "Southwest Technical University",
+        location: "Phoenix, AZ",
+        overview:
+          "Specializing in renewable energy and desert ecology research.",
+        courses: [],
         professors: [],
         publicChatId: new ObjectId().toString(),
       },
@@ -87,61 +138,447 @@ async function main() {
       } new universities`
     );
 
-    // Get all university IDs
-    const allUniversities = await universitiesCollection.find({}).toArray();
+    const universityDepartments = {
+      0: ["Computer Science", "Mathematics", "Electrical Engineering"],
+      1: ["Marine Biology", "Oceanography", "Environmental Science"],
+      2: ["Literature", "Philosophy", "Business Administration"],
+      3: ["Geology", "Environmental Studies", "Recreation Management"],
+      4: ["Computer Engineering", "Data Science", "Business Innovation"],
+      5: ["Finance", "Economics", "International Business"],
+      6: ["Medicine", "Nursing", "Public Health"],
+      7: ["Environmental Engineering", "Forestry", "Sustainable Design"],
+      8: ["Mechanical Engineering", "Automotive Design", "Materials Science"],
+      9: ["Renewable Energy", "Desert Ecology", "Sustainable Agriculture"],
+    };
 
-    // Create professors
+    const departmentCourses = {
+      "Computer Science": [
+        "Introduction to Programming",
+        "Data Structures",
+        "Algorithms",
+        "Machine Learning",
+        "Web Development",
+      ],
+      Mathematics: [
+        "Calculus I",
+        "Linear Algebra",
+        "Differential Equations",
+        "Statistics",
+        "Discrete Mathematics",
+      ],
+      "Electrical Engineering": [
+        "Circuit Analysis",
+        "Digital Systems",
+        "Signals and Systems",
+        "Microelectronics",
+        "Control Systems",
+      ],
+      "Marine Biology": [
+        "Marine Ecosystems",
+        "Fish Biology",
+        "Coral Reef Ecology",
+        "Marine Conservation",
+        "Oceanography",
+      ],
+      Oceanography: [
+        "Physical Oceanography",
+        "Chemical Oceanography",
+        "Marine Geology",
+        "Ocean Dynamics",
+        "Coastal Processes",
+      ],
+      "Environmental Science": [
+        "Ecology",
+        "Environmental Chemistry",
+        "Climate Science",
+        "Conservation Biology",
+        "Sustainable Development",
+      ],
+      Literature: [
+        "World Literature",
+        "Creative Writing",
+        "Literary Theory",
+        "Shakespeare Studies",
+        "Modern Poetry",
+      ],
+      Philosophy: [
+        "Ethics",
+        "Logic",
+        "Metaphysics",
+        "Philosophy of Mind",
+        "Political Philosophy",
+      ],
+      "Business Administration": [
+        "Management Principles",
+        "Marketing",
+        "Organizational Behavior",
+        "Business Ethics",
+        "Strategic Management",
+      ],
+      Geology: [
+        "Physical Geology",
+        "Mineralogy",
+        "Structural Geology",
+        "Sedimentology",
+        "Geomorphology",
+      ],
+      "Environmental Studies": [
+        "Environmental Policy",
+        "Natural Resource Management",
+        "Environmental Impact Assessment",
+        "Ecosystem Management",
+        "Environmental Law",
+      ],
+      "Recreation Management": [
+        "Outdoor Leadership",
+        "Park Management",
+        "Adventure Programming",
+        "Ecotourism",
+        "Wilderness First Aid",
+      ],
+      "Computer Engineering": [
+        "Computer Architecture",
+        "Operating Systems",
+        "Embedded Systems",
+        "Computer Networks",
+        "VLSI Design",
+      ],
+      "Data Science": [
+        "Data Mining",
+        "Machine Learning",
+        "Big Data Analytics",
+        "Statistical Computing",
+        "Data Visualization",
+      ],
+      "Business Innovation": [
+        "Entrepreneurship",
+        "Product Development",
+        "Innovation Management",
+        "Venture Capital",
+        "Business Model Design",
+      ],
+      Finance: [
+        "Corporate Finance",
+        "Investment Analysis",
+        "Financial Markets",
+        "Risk Management",
+        "International Finance",
+      ],
+      Economics: [
+        "Microeconomics",
+        "Macroeconomics",
+        "Econometrics",
+        "International Trade",
+        "Development Economics",
+      ],
+      "International Business": [
+        "Global Marketing",
+        "International Management",
+        "Cross-Cultural Communication",
+        "Global Supply Chain",
+        "International Finance",
+      ],
+      Medicine: [
+        "Anatomy",
+        "Physiology",
+        "Pathology",
+        "Pharmacology",
+        "Clinical Medicine",
+      ],
+      Nursing: [
+        "Fundamentals of Nursing",
+        "Medical-Surgical Nursing",
+        "Pediatric Nursing",
+        "Mental Health Nursing",
+        "Community Health",
+      ],
+      "Public Health": [
+        "Epidemiology",
+        "Biostatistics",
+        "Health Policy",
+        "Global Health",
+        "Environmental Health",
+      ],
+      "Environmental Engineering": [
+        "Water Treatment",
+        "Air Pollution Control",
+        "Waste Management",
+        "Environmental Modeling",
+        "Remediation Technologies",
+      ],
+      Forestry: [
+        "Forest Ecology",
+        "Silviculture",
+        "Forest Management",
+        "Wildlife Habitat",
+        "Forest Economics",
+      ],
+      "Sustainable Design": [
+        "Green Building Design",
+        "Sustainable Materials",
+        "Energy Efficient Design",
+        "Ecological Design",
+        "Urban Planning",
+      ],
+      "Mechanical Engineering": [
+        "Thermodynamics",
+        "Fluid Mechanics",
+        "Machine Design",
+        "Heat Transfer",
+        "Robotics",
+      ],
+      "Automotive Design": [
+        "Vehicle Dynamics",
+        "Powertrain Systems",
+        "Automotive Electronics",
+        "Vehicle Safety",
+        "Autonomous Vehicles",
+      ],
+      "Materials Science": [
+        "Materials Characterization",
+        "Polymer Science",
+        "Metallurgy",
+        "Composite Materials",
+        "Nanomaterials",
+      ],
+      "Renewable Energy": [
+        "Solar Energy Systems",
+        "Wind Energy",
+        "Bioenergy",
+        "Energy Storage",
+        "Smart Grid Technologies",
+      ],
+      "Desert Ecology": [
+        "Desert Ecosystems",
+        "Arid Land Management",
+        "Desert Wildlife",
+        "Desert Plant Biology",
+        "Desert Hydrology",
+      ],
+      "Sustainable Agriculture": [
+        "Organic Farming",
+        "Agroecology",
+        "Irrigation Systems",
+        "Soil Conservation",
+        "Crop Science",
+      ],
+    };
+
+    console.log("Creating courses...");
+    const courseData = [];
+    const universityCoursesMap = {}; // To track courses for each university
+
+    for (let uniIndex = 0; uniIndex < 10; uniIndex++) {
+      const universityId = universityResults.insertedIds[uniIndex].toString();
+      const departments = universityDepartments[uniIndex];
+      universityCoursesMap[universityId] = [];
+
+      for (let deptIndex = 0; deptIndex < departments.length; deptIndex++) {
+        const department = departments[deptIndex];
+        const courseTitles = departmentCourses[department];
+
+        for (let i = 0; i < 5; i++) {
+          const courseTitle = courseTitles[i];
+
+          courseData.push({
+            title: courseTitle,
+            description: `Comprehensive course covering ${courseTitle.toLowerCase()} principles and applications.`,
+            universityId: universityId,
+            professorId: null, 
+            department: department,
+            studentsEnrolled: [],
+          });
+        }
+      }
+    }
+
+    const courseResults = await coursesCollection.insertMany(courseData);
+    console.log(
+      `Added ${Object.keys(courseResults.insertedIds).length} new courses`
+    );
+
+    for (let i = 0; i < courseData.length; i++) {
+      const courseId = courseResults.insertedIds[i].toString();
+      const universityId = courseData[i].universityId;
+
+      universityCoursesMap[universityId].push({
+        id: courseId,
+        department: courseData[i].department,
+      });
+
+      await universitiesCollection.updateOne(
+        { _id: new ObjectId(universityId) },
+        { $push: { courses: courseId } }
+      );
+    }
+
     console.log("Creating professors...");
-    const professorData = [
-      {
-        userId: new ObjectId().toString(), 
-        universityId: universityResults.insertedIds[0].toString(),
-        department: "Computer Science",
-        courses: ["Machine Learning", "Data Mining"],
-        ratings: [],
-        averageRating: 0,
-      },
-      {
-        userId: new ObjectId().toString(),
-        universityId: universityResults.insertedIds[1].toString(),
-        department: "Physics",
-        courses: ["Quantum Mechanics", "Theoretical Physics"],
-        ratings: [],
-        averageRating: 0,
-      },
-      {
-        userId: new ObjectId().toString(),
-        universityId: universityResults.insertedIds[2].toString(),
-        department: "Biology",
-        courses: ["Molecular Biology", "Genetics"],
-        ratings: [],
-        averageRating: 0,
-      },
-      {
-        userId: new ObjectId().toString(),
-        universityId: universityResults.insertedIds[0].toString(),
-        department: "Mathematics",
-        courses: ["Advanced Calculus", "Linear Algebra"],
-        ratings: [],
-        averageRating: 0,
-      },
-      {
-        userId: new ObjectId().toString(),
-        universityId: universityResults.insertedIds[1].toString(),
-        department: "Chemistry",
-        courses: ["Organic Chemistry", "Biochemistry"],
-        ratings: [],
-        averageRating: 0,
-      },
-      {
-        userId: new ObjectId().toString(),
-        universityId: universityResults.insertedIds[3].toString(),
-        department: "History",
-        courses: ["World History", "American Revolution"],
-        ratings: [],
-        averageRating: 0,
-      },
-    ];
+    const professorData = [];
+
+    const professorNamesByDepartment = {
+      "Computer Science": [
+        "Dr. Alan Turing",
+        "Dr. Grace Hopper",
+        "Dr. Ada Lovelace",
+      ],
+      Mathematics: [
+        "Dr. Katherine Johnson",
+        "Dr. John Nash",
+        "Dr. Emmy Noether",
+      ],
+      "Electrical Engineering": [
+        "Dr. Nikola Tesla",
+        "Dr. Thomas Edison",
+        "Dr. Claude Shannon",
+      ],
+      "Marine Biology": [
+        "Dr. Jacques Cousteau",
+        "Dr. Sylvia Earle",
+        "Dr. Rachel Carson",
+      ],
+      Oceanography: [
+        "Dr. Robert Ballard",
+        "Dr. Marie Tharp",
+        "Dr. Charles Wyville Thomson",
+      ],
+      "Environmental Science": [
+        "Dr. Jane Goodall",
+        "Dr. E.O. Wilson",
+        "Dr. Wangari Maathai",
+      ],
+      Literature: [
+        "Dr. Harold Bloom",
+        "Dr. Toni Morrison",
+        "Dr. Northrop Frye",
+      ],
+      Philosophy: [
+        "Dr. Martha Nussbaum",
+        "Dr. Peter Singer",
+        "Dr. Judith Butler",
+      ],
+      "Business Administration": [
+        "Dr. Peter Drucker",
+        "Dr. Clayton Christensen",
+        "Dr. Rosabeth Moss Kanter",
+      ],
+      Geology: ["Dr. Charles Lyell", "Dr. Marie Curie", "Dr. James Hutton"],
+      "Environmental Studies": [
+        "Dr. Aldo Leopold",
+        "Dr. Gro Harlem Brundtland",
+        "Dr. David Suzuki",
+      ],
+      "Recreation Management": [
+        "Dr. Aldo Leopold",
+        "Dr. John Muir",
+        "Dr. Gifford Pinchot",
+      ],
+      "Computer Engineering": [
+        "Dr. Gordon Moore",
+        "Dr. Vint Cerf",
+        "Dr. Anita Borg",
+      ],
+      "Data Science": [
+        "Dr. Andrew Ng",
+        "Dr. Fei-Fei Li",
+        "Dr. Geoffrey Hinton",
+      ],
+      "Business Innovation": [
+        "Dr. Clayton Christensen",
+        "Dr. W. Chan Kim",
+        "Dr. Rita McGrath",
+      ],
+      Finance: ["Dr. Eugene Fama", "Dr. Robert Shiller", "Dr. Harry Markowitz"],
+      Economics: ["Dr. Paul Krugman", "Dr. Esther Duflo", "Dr. Amartya Sen"],
+      "International Business": [
+        "Dr. Pankaj Ghemawat",
+        "Dr. Geert Hofstede",
+        "Dr. C.K. Prahalad",
+      ],
+      Medicine: [
+        "Dr. Anthony Fauci",
+        "Dr. Elizabeth Blackwell",
+        "Dr. Jonas Salk",
+      ],
+      Nursing: [
+        "Dr. Florence Nightingale",
+        "Dr. Virginia Henderson",
+        "Dr. Martha Rogers",
+      ],
+      "Public Health": [
+        "Dr. Michael Marmot",
+        "Dr. Mary Bassett",
+        "Dr. Paul Farmer",
+      ],
+      "Environmental Engineering": [
+        "Dr. Ellen Swallow Richards",
+        "Dr. G.D. Agrawal",
+        "Dr. Abel Wolman",
+      ],
+      Forestry: [
+        "Dr. Wangari Maathai",
+        "Dr. Gifford Pinchot",
+        "Dr. Suzanne Simard",
+      ],
+      "Sustainable Design": [
+        "Dr. William McDonough",
+        "Dr. Janine Benyus",
+        "Dr. Buckminster Fuller",
+      ],
+      "Mechanical Engineering": [
+        "Dr. Bill Nye",
+        "Dr. Mae Jemison",
+        "Dr. Robert Goddard",
+      ],
+      "Automotive Design": [
+        "Dr. Ferdinand Porsche",
+        "Dr. Kelly Johnson",
+        "Dr. Mary Anderson",
+      ],
+      "Materials Science": [
+        "Dr. Mildred Dresselhaus",
+        "Dr. Richard Feynman",
+        "Dr. Stephanie Kwolek",
+      ],
+      "Renewable Energy": [
+        "Dr. Ashok Gadgil",
+        "Dr. Martin Green",
+        "Dr. Maria Telkes",
+      ],
+      "Desert Ecology": [
+        "Dr. Jane Goodall",
+        "Dr. Janice Bowers",
+        "Dr. Robert Ricklefs",
+      ],
+      "Sustainable Agriculture": [
+        "Dr. Vandana Shiva",
+        "Dr. Wes Jackson",
+        "Dr. Miguel Altieri",
+      ],
+    };
+
+    for (let uniIndex = 0; uniIndex < 10; uniIndex++) {
+      const universityId = universityResults.insertedIds[uniIndex].toString();
+      const departments = universityDepartments[uniIndex];
+
+      for (let deptIndex = 0; deptIndex < departments.length; deptIndex++) {
+        const department = departments[deptIndex];
+        const professorName =
+          professorNamesByDepartment[department][deptIndex % 3];
+
+        const departmentCourses = universityCoursesMap[universityId]
+          .filter((course) => course.department === department)
+          .map((course) => course.id);
+
+        professorData.push({
+          name: professorName,
+          department: department,
+          universityId: universityId,
+          courses: departmentCourses,
+          ratings: [],
+          averageRating: 0,
+        });
+      }
+    }
 
     const professorResults = await professorsCollection.insertMany(
       professorData
@@ -150,81 +587,31 @@ async function main() {
       `Added ${Object.keys(professorResults.insertedIds).length} new professors`
     );
 
-    // Create courses
-    console.log("Creating courses...");
-    const courseData = [
-      {
-        title: "Introduction to Machine Learning",
-        description:
-          "An overview of machine learning algorithms and applications.",
-        universityId: universityResults.insertedIds[0].toString(),
-        professorId: professorResults.insertedIds[0].toString(),
-        studentsEnrolled: [],
-      },
-      {
-        title: "Quantum Physics",
-        description:
-          "Study of quantum mechanics and its applications in modern physics.",
-        universityId: universityResults.insertedIds[1].toString(),
-        professorId: professorResults.insertedIds[1].toString(),
-        studentsEnrolled: [],
-      },
-      {
-        title: "Molecular Biology Techniques",
-        description:
-          "Laboratory techniques in molecular biology and genetic engineering.",
-        universityId: universityResults.insertedIds[2].toString(),
-        professorId: professorResults.insertedIds[2].toString(),
-        studentsEnrolled: [],
-      },
-      {
-        title: "Advanced Calculus",
-        description:
-          "In-depth study of calculus concepts including limits, derivatives, and integrals.",
-        universityId: universityResults.insertedIds[0].toString(),
-        professorId: professorResults.insertedIds[3].toString(),
-        studentsEnrolled: [],
-      },
-      {
-        title: "Organic Chemistry Lab",
-        description:
-          "Laboratory course focusing on organic chemistry reactions and techniques.",
-        universityId: universityResults.insertedIds[1].toString(),
-        professorId: professorResults.insertedIds[4].toString(),
-        studentsEnrolled: [],
-      },
-      {
-        title: "American History: Revolution to Civil War",
-        description:
-          "Comprehensive study of American history from 1776 to 1865.",
-        universityId: universityResults.insertedIds[3].toString(),
-        professorId: professorResults.insertedIds[5].toString(),
-        studentsEnrolled: [],
-      },
-      {
-        title: "Data Structures and Algorithms",
-        description:
-          "Implementation and analysis of fundamental data structures and algorithms.",
-        universityId: universityResults.insertedIds[0].toString(),
-        professorId: professorResults.insertedIds[0].toString(),
-        studentsEnrolled: [],
-      },
-      {
-        title: "Environmental Chemistry",
-        description:
-          "Study of chemical processes in the environment and their impact on ecosystems.",
-        universityId: universityResults.insertedIds[2].toString(),
-        professorId: professorResults.insertedIds[4].toString(),
-        studentsEnrolled: [],
-      },
-    ];
+    for (let i = 0; i < professorData.length; i++) {
+      const profId = professorResults.insertedIds[i].toString();
+      const uniId = professorData[i].universityId;
 
-    const courseResults = await coursesCollection.insertMany(courseData);
-    console.log(
-      `Added ${Object.keys(courseResults.insertedIds).length} new courses`
+      await universitiesCollection.updateOne(
+        { _id: new ObjectId(uniId) },
+        { $push: { professors: profId } }
+      );
+    }
+
+    for (let i = 0; i < professorData.length; i++) {
+      const profId = professorResults.insertedIds[i].toString();
+      const courseIds = professorData[i].courses;
+
+      for (const courseId of courseIds) {
+        await coursesCollection.updateOne(
+          { _id: new ObjectId(courseId) },
+          { $set: { professorId: profId } }
+        );
+      }
+    }
+
+    await import("./config/mongoConnection.js").then((m) =>
+      m.closeConnection()
     );
-
-    await import("./config/mongoConnection.js").then(m => m.closeConnection());
     console.log("Seeding completed successfully!");
   } catch (e) {
     console.error("Error during seeding:", e);

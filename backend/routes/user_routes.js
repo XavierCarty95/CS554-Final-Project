@@ -6,7 +6,6 @@ import { strCheck, validateName } from "../helpers.js";
 
 const router = express.Router();
 
-// Existing routes remain unchanged
 router.get("/:userId", async (req, res) => {
   try {
     const user = await usersData.getUserById(req.params.userId);
@@ -22,12 +21,10 @@ router.get("/:userId", async (req, res) => {
   }
 });
 
-// routes/user_routes.js (add these routes)
 router.get("/:userId/forums", async (req, res) => {
   try {
     const { userId } = req.params;
 
-    // Convert userId to ObjectId if valid
     let userIdObj;
     try {
       userIdObj = ObjectId.isValid(userId) ? new ObjectId(userId) : userId;
@@ -52,7 +49,6 @@ router.get("/:userId/posts", async (req, res) => {
   try {
     const { userId } = req.params;
 
-    // Convert userId to ObjectId if valid
     let userIdObj;
     try {
       userIdObj = ObjectId.isValid(userId) ? new ObjectId(userId) : userId;
@@ -66,7 +62,6 @@ router.get("/:userId/posts", async (req, res) => {
       .sort({ createdAt: -1 })
       .toArray();
 
-    // Get forum info for each post
     const forumsCollection = await forums();
     for (const post of userPosts) {
       const forum = await forumsCollection.findOne({ _id: post.forumId });
@@ -80,13 +75,11 @@ router.get("/:userId/posts", async (req, res) => {
   }
 });
 
-// Updated PUT route with validation
 router.put("/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
     const { name, email, major, year } = req.body;
 
-    // Ensure the user is updating their own profile
     if (!req.session.user || req.session.user._id !== userId) {
       console.log("Unauthorized update attempt");
       return res
@@ -94,13 +87,10 @@ router.put("/:userId", async (req, res) => {
         .json({ error: "Unauthorized to update this profile" });
     }
 
-    // Validate input fields using helper functions
     try {
-      // Validate name
       strCheck(name, "Name");
       validateName(name);
 
-      // Validate email using custom function
       validateEmail(email);
     } catch (validationError) {
       return res.status(400).json({ error: validationError.message });
@@ -127,7 +117,6 @@ router.put("/:userId", async (req, res) => {
 
     const existingUser = await userCollection.findOne({ _id: userIdObj });
     if (!existingUser) {
-      console.log("User not found in database for ID:", userIdObj);
       return res.status(404).json({ error: "User not found in database" });
     }
 
@@ -149,7 +138,6 @@ router.put("/:userId", async (req, res) => {
   }
 });
 
-// Custom email validation function inspired by search results
 function validateEmail(email) {
   if (!email || typeof email !== "string") {
     throw new Error("Email must be a non-empty string");
@@ -158,7 +146,6 @@ function validateEmail(email) {
   if (email.length === 0) {
     throw new Error("Email cannot be empty or just spaces");
   }
-  // Simple regex for email validation as shown in search results
   const emailRegex = /^[\w\.-]+@[\w\.-]+\.\w+$/;
   if (!emailRegex.test(email)) {
     throw new Error("Invalid email format");

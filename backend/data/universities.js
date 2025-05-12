@@ -1,4 +1,3 @@
-
 import { dbConnection } from "../config/mongoConnection.js";
 import { ObjectId } from "mongodb";
 
@@ -46,16 +45,15 @@ export const getUniversityDropdown = async () => {
   return universities;
 };
 
-
 export const getRequiredCoursesForMajor = async (universityId, major) => {
   const universitiesCollection = await getUniversitiesCollection();
-  const university = await universitiesCollection.findOne({ _id: new ObjectId(universityId) });
+  const university = await universitiesCollection.findOne({
+    _id: new ObjectId(universityId),
+  });
 
   if (!university || !university.requiredCourses) {
     throw new Error("Required courses not found");
   }
 
-  return university.requiredCourses.filter(
-    (course) => course.major === major
-  );
+  return university.requiredCourses.filter((course) => course.major === major);
 };

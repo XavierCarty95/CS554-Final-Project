@@ -1,4 +1,3 @@
-
 import { ObjectId } from "mongodb";
 import { posts, forums, users } from "../config/mongoCollections.js";
 import { getRedisClient } from "../config/connectRedis.js";
@@ -45,7 +44,7 @@ export const getPostsByForum = async (forumId) => {
   try {
     const redisClient = getRedisClient();
     const cacheKey = `posts:forum:${forumId}`;
-    await redisClient.setEx(cacheKey, 300, JSON.stringify(postList)); 
+    await redisClient.setEx(cacheKey, 300, JSON.stringify(postList));
     console.log("Posts cached for forum:", forumId);
   } catch (error) {
     console.error("Redis caching error:", error);
@@ -65,6 +64,16 @@ export const createPost = async (forumId, authorId, content) => {
 
   if (!content || typeof content !== "string" || content.trim() === "") {
     throw new Error("Content cannot be empty");
+  }
+
+  content = content.trim();
+
+  if (content.length < 10) {
+    throw new Error("Content must be at least 10 characters long");
+  }
+
+  if (!/[a-zA-Z0-9]/.test(content)) {
+    throw new Error("Content must contain at least one letter or number");
   }
 
   forumId = forumId.trim();
@@ -154,10 +163,6 @@ export const votePost = async (postId, userId, voteType) => {
   try {
     const redisClient = getRedisClient();
     await redisClient.del(`posts:forum:${post.forumId}`);
-    console.log(
-      "Forum posts cache invalidated after vote for forum:",
-      post.forumId
-    );
   } catch (error) {
     console.error("Redis cache invalidation error:", error);
   }

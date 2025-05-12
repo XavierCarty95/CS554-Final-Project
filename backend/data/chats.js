@@ -175,7 +175,7 @@ export const isChatExists = async (senderId, receipentId) => {
     members: { $all: ids },
     type: "personal",
   });
-  console.log(chat);
+ 
   if (!chat) {
     return false;
   }

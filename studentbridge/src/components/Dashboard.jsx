@@ -1,50 +1,51 @@
-import React from "react";
-import SearchBar from "./SearchBar";
-import { NavLink, Routes, Route } from "react-router-dom";
+/* eslint-disable no-unused-vars */
+
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+
 
 function Dashboard() {
   return (
-    <main className="flex flex-col min-h-screen">
-      <section className="bg-white py-16">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold mb-4">
-            Welcome to Student Bridge
-          </h1>
-          <p className="text-xl mb-8 text-gray-600">
-            Connect, Learn, and Thrive Together
-          </p>
-          <div className="max-w-md mx-auto mb-8">
-            <SearchBar />
-          </div>
-        </div>
-      </section>
+    <div className="max-w-6xl mx-auto p-4">
+      <h1 className="text-3xl font-bold text-center mb-6">
+        Welcome to Student Bridge
+      </h1>
+      <p className="text-center text-gray-600 mb-8">
+        Connect, Learn, andx Thrive Together
+      </p>
 
-      <footer className="footer bg-white py-10 mt-auto ">
-        <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center ">
-          <p className="text-gray-500 mb-4 md:mb-0">
-            &copy; {new Date().getFullYear()} Student Bridge. All rights
-            reserved.
+      <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="p-6 bg-white rounded-lg shadow-sm border">
+          <h2 className="text-xl font-semibold mb-3">Universities</h2>
+          <p className="text-gray-600 mb-4">
+            Explore universities and their programs
           </p>
-          <div className="links flex space-x-6">
-            <NavLink to="/about" className="text-gray-500 hover:text-gray-800">
-              About
-            </NavLink>
-            <NavLink
-              to="/contact"
-              className="text-gray-500 hover:text-gray-800"
-            >
-              Contact
-            </NavLink>
-            <NavLink
-              to="/privacy"
-              className="text-gray-500 hover:text-gray-800"
-            >
-              Privacy Policy
-            </NavLink>
-          </div>
+          <Link to="/university" className="text-blue-600 hover:underline">
+            Browse all universities →
+          </Link>
         </div>
-      </footer>
-    </main>
+
+        <div className="p-6 bg-white rounded-lg shadow-sm border">
+          <h2 className="text-xl font-semibold mb-3">Professors</h2>
+          <p className="text-gray-600 mb-4">
+            Find professors and read their reviews
+          </p>
+          <p className="text-blue-600">
+            Select a university to view professors →
+          </p>
+        </div>
+
+        <div className="p-6 bg-white rounded-lg shadow-sm border">
+          <h2 className="text-xl font-semibold mb-3">Courses</h2>
+          <p className="text-gray-600 mb-4">
+            Discover courses offered at universities
+          </p>
+          <Link to="/courses" className="text-blue-600 hover:underline">
+            Browse all courses →
+          </Link>
+        </div>
+      </div>
+    </div>
   );
 }
 
