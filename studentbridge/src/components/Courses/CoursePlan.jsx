@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import axiosInstance from '../../config/axiosConfig';
 
 const CoursePlan = () => {
   const [universities, setUniversities] = useState([]);
@@ -8,68 +8,100 @@ const CoursePlan = () => {
   const [selectedMajor, setSelectedMajor] = useState('');
   const [plan, setPlan] = useState(null);
 
+  // 🔄 Corrected path: relative URL to respect baseURL from axiosInstance
   useEffect(() => {
-    axios.get('/api/universities').then((res) => setUniversities(res.data));
+    axiosInstance.get('/universities').then((res) => {
+      console.log("✔️ Universities loaded:", res.data);
+      setUniversities(res.data);
+    });
   }, []);
 
+  // 🔄 Corrected path: relative URL to respect baseURL from axiosInstance
   useEffect(() => {
     if (selectedUniversity) {
-      axios.get(`/api/universities/${selectedUniversity}`).then((res) => {
-        const majors = [...new Set(res.data.requiredCourses.map((c) => c.major))];
-        setMajors(majors);
+      axiosInstance.get(`/universities/${selectedUniversity}`).then((res) => {
+        console.log("Selected university details:", res.data);
+        const requiredCourses = Array.isArray(res.data.requiredCourses) ? res.data.requiredCourses : [];
+        const majorsSet = new Set();
+        requiredCourses.forEach((course) => {
+          if (course.major && typeof course.major === 'string') {
+            majorsSet.add(course.major);
+          }
+        });
+        setMajors([...majorsSet]);
+        console.log("Majors extracted:", [...majorsSet]);
       });
     }
   }, [selectedUniversity]);
 
+  // 🔄 Corrected path: relative URL to respect baseURL from axiosInstance
   useEffect(() => {
     if (selectedUniversity && selectedMajor) {
-      axios
+      console.log("📤 Fetching plan for:", selectedUniversity, selectedMajor);
+      axiosInstance
         .get(`/api/scheduler/full-plan/${selectedUniversity}/${selectedMajor}`)
-        .then((res) => setPlan(res.data));
+        .then((res) => {
+          console.log("📥 Received plan:", res.data);
+          setPlan(res.data);
+        });
     }
   }, [selectedUniversity, selectedMajor]);
 
   return (
-    <div style={{ padding: '2rem' }}>
-      <h2>🧭 4-Year Guided Course Plan</h2>
+    <div className="min-h-screen bg-gray-50 py-10 px-4">
+      <div className="max-w-5xl mx-auto bg-white shadow-md rounded-lg p-8">
+        <h2 className="text-3xl font-bold text-blue-700 mb-8 text-center">🧭 4-Year Guided Course Plan</h2>
 
-      <label>University:</label>
-      <select onChange={(e) => setSelectedUniversity(e.target.value)}>
-        <option value="">Select</option>
-        {universities.map((u) => (
-          <option key={u._id} value={u._id}>{u.name}</option>
-        ))}
-      </select>
-
-      <label>Major:</label>
-      <select onChange={(e) => setSelectedMajor(e.target.value)} disabled={!selectedUniversity}>
-        <option value="">Select</option>
-        {majors.map((m) => <option key={m}>{m}</option>)}
-      </select>
-
-      {plan && (
-        <div>
-          {Object.entries(plan).map(([year, semesters]) => (
-            <div key={year} style={{ marginTop: '1rem' }}>
-              <h3>{year}</h3>
-              <div style={{ display: 'flex', gap: '2rem' }}>
-                {['Fall', 'Spring'].map((sem) => (
-                  <div key={sem}>
-                    <h4>{sem}</h4>
-                    <ul>
-                      {(semesters[sem] || []).map((c) => (
-                        <li key={c.title}>
-                          <strong>{c.title}</strong> — {c.description}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
+        <div className="mb-6">
+          <label className="block mb-2 font-medium text-gray-700">University:</label>
+          <select
+            className="w-full border rounded p-2"
+            onChange={(e) => setSelectedUniversity(e.target.value)}
+          >
+            <option value="">Select</option>
+            {Array.isArray(universities) &&
+              universities.map((u) => (
+                <option key={u._id} value={u._id}>{u.name}</option>
+              ))}
+          </select>
         </div>
-      )}
+
+        <div className="mb-6">
+          <label className="block mb-2 font-medium text-gray-700">Major:</label>
+          <select
+            className="w-full border rounded p-2"
+            onChange={(e) => setSelectedMajor(e.target.value)}
+            disabled={!selectedUniversity}
+          >
+            <option value="">Select</option>
+            {majors.map((m) => <option key={m}>{m}</option>)}
+          </select>
+        </div>
+
+        {plan && (
+          <div>
+            {Object.entries(plan).map(([year, semesters]) => (
+              <div key={year} className="mb-8">
+                <h3 className="text-2xl font-semibold text-gray-800 mb-4">{year}</h3>
+                <div className="grid md:grid-cols-2 gap-6 mt-4">
+                  {['Fall', 'Spring'].map((sem) => (
+                    <div key={sem} className="border p-4 rounded shadow bg-gray-50">
+                      <h4 className="font-semibold text-lg text-blue-600 mb-2">{sem}</h4>
+                      <ul>
+                        {(semesters[sem] || []).map((c) => (
+                          <li key={c.title} className="mb-1">
+                            <strong>{c.title}</strong> — {c.description}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

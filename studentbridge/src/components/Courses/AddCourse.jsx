@@ -48,6 +48,7 @@ function AddCourse() {
         professorId: user._id,
       });
       navigate(`/profile/${user._id}`);
+      setSelectedCourseId("");
     } catch (err) {
       setError("Failed to add course.");
     }
@@ -59,28 +60,35 @@ function AddCourse() {
 
   return (
     <div className="max-w-2xl mx-auto p-6">
-      <h2 className="text-2xl font-bold mb-4">Add New Course</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <h2 className="text-2xl font-bold mb-6">Add New Course</h2>
+      <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label className="block mb-1 font-medium">Course Title</label>
-          <select
-            className="w-full border p-2 rounded"
-            value={selectedCourseId}
-            onChange={(e) => setSelectedCourseId(e.target.value)}
-            required
-          >
-            <option value="">Select a course</option>
-            {availableCourses.map((course) => (
-              <option key={course._id} value={course._id}>
-                {course.title}
-              </option>
-            ))}
-          </select>
+          <label htmlFor="course-select" className="block mb-2 font-medium">
+            Course Title
+          </label>
+          {availableCourses.length === 0 ? (
+            <p className="text-gray-500">No available courses to select.</p>
+          ) : (
+            <select
+              id="course-select"
+              className="w-full border p-2 rounded"
+              value={selectedCourseId}
+              onChange={(e) => setSelectedCourseId(e.target.value)}
+              required
+            >
+              <option value="">Select a course</option>
+              {availableCourses.map((course) => (
+                <option key={course._id} value={course._id}>
+                  {course.title}
+                </option>
+              ))}
+            </select>
+          )}
         </div>
 
         <button
           type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mb-2"
         >
           Add Course
         </button>

@@ -8,12 +8,17 @@ const router = express.Router();
 router.get('/recommendations/:universityId/:major/:semester', async (req, res) => {
   const { universityId, major, semester } = req.params;
 
+  const semesterNum = parseInt(semester);
+  if (isNaN(semesterNum)) {
+    return res.status(400).json({ error: "Invalid semester number" });
+  }
+
   try {
     const allCourses = await getRequiredCoursesForMajor(universityId, major);
     const recommended = allCourses.filter(
       (course) =>
-        course.yearRecommended === parseInt(semester) &&
-        course.semesterOffered === 'Fall' // or dynamic based on time
+        course.yearRecommended === semesterNum &&
+        course.semesterOffered === (semesterNum % 2 === 1 ? 'Fall' : 'Spring')
     );
     res.json(recommended);
   } catch (e) {
@@ -35,9 +40,20 @@ router.get('/full-plan/:universityId/:major', async (req, res) => {
     const university = await universitiesCol.findOne({ _id: new ObjectId(universityId) });
 
     if (!university) return res.status(404).json({ error: "University not found" });
-    if (!university.requiredCourses) return res.status(404).json({ error: "No required courses found" });
+    if (!Array.isArray(university.requiredCourses)) {
+      return res.status(404).json({ error: "Course data is invalid" });
+    }
 
-    const majorCourses = university.requiredCourses.filter(c => c.major === major);
+    console.log("📊 University:", university.name);
+    console.log("📚 Requested major:", major);
+    console.log("📌 Matching courses:");
+    const majorCourses = university.requiredCourses.filter((c) => {
+      const isMatch = c.major?.toLowerCase() === major.toLowerCase();
+      if (isMatch) {
+        console.log(`✔ ${c.title} - Year ${c.yearRecommended}, ${c.semesterOffered}`);
+      }
+      return isMatch;
+    });
 
     const plan = {
       year1: { Fall: [], Spring: [] },
@@ -47,9 +63,11 @@ router.get('/full-plan/:universityId/:major', async (req, res) => {
     };
 
     for (const course of majorCourses) {
-      const yearKey = `year${course.yearRecommended}`;
-      if (plan[yearKey] && plan[yearKey][course.semesterOffered]) {
-        plan[yearKey][course.semesterOffered].push(course);
+      const year = Number(course.yearRecommended);
+      const sem = course.semesterOffered?.charAt(0).toUpperCase() + course.semesterOffered?.slice(1).toLowerCase();
+      const yearKey = `year${year}`;
+      if (plan[yearKey] && ['Fall', 'Spring'].includes(sem)) {
+        plan[yearKey][sem].push(course);
       }
     }
 
