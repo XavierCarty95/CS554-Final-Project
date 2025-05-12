@@ -94,7 +94,7 @@ async function main() {
     console.log("Creating professors...");
     const professorData = [
       {
-        userId: new ObjectId().toString(), // Placeholder userId (would normally reference a user)
+        userId: new ObjectId().toString(), 
         universityId: universityResults.insertedIds[0].toString(),
         department: "Computer Science",
         courses: ["Machine Learning", "Data Mining"],
