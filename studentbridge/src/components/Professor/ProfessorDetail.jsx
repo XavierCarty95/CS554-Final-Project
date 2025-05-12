@@ -193,14 +193,18 @@ function ProfessorDetailPage() {
 
       {/* Courses taught by this professor */}
       <h3 className="text-xl font-semibold mt-8 mb-2">Courses Taught by {professor.name}</h3>
-      <ul className="space-y-4 mb-4">
-        {professorCourses.map((course) => (
-          <li key={course._id} className="border p-3 rounded bg-gray-100">
-            <h4 className="font-semibold">{course.title}</h4>
-            <p className="text-sm text-gray-700">{course.description}</p>
-          </li>
-        ))}
-      </ul>
+      {professorCourses.length === 0 ? (
+        <p className="text-gray-500 italic">No courses assigned to this professor yet.</p>
+      ) : (
+        <ul className="space-y-4 mb-4">
+          {professorCourses.map((course) => (
+            <li key={course._id} className="border p-3 rounded bg-gray-100">
+              <h4 className="font-semibold">{course.title}</h4>
+              <p className="text-sm text-gray-700">{course.description}</p>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

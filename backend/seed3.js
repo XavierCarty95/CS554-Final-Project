@@ -1,6 +1,7 @@
 import { universities, professors, courses } from "./config/mongoCollections.js";
 import { ObjectId } from "mongodb";
 
+
 const newUniversities = [
   {
     name: "Pacific Tech University",
@@ -1011,10 +1012,26 @@ const newCourses = [
   }
 ];
 
+function generateCourseCode(major, index) {
+  const prefix = major
+    .split(' ')
+    .map(word => word[0].toUpperCase())
+    .join('');
+  return `${prefix}${500 + index}`; // e.g., CS501, BIO502
+}
+
 const run = async () => {
   const universitiesCol = await universities();
   const professorsCol = await professors();
   const coursesCol = await courses();
+
+  // Assign code to each requiredCourse using generateCourseCode
+  let courseIndex = 0;
+  for (const uni of newUniversities) {
+    for (const course of uni.requiredCourses) {
+      course.code = generateCourseCode(course.major, courseIndex++);
+    }
+  }
 
   const uniMap = {}; // name -> _id
 
@@ -1034,16 +1051,12 @@ const run = async () => {
     } else {
       uniMap[uni.name] = existing._id;
 
-      // Only update requiredCourses if not already set
-      if (!existing.requiredCourses || existing.requiredCourses.length === 0) {
-        await universitiesCol.updateOne(
-          { _id: existing._id },
-          { $set: { requiredCourses: uni.requiredCourses } }
-        );
-        console.log(`🔁 Updated requiredCourses for: ${uni.name}`);
-      } else {
-        console.log(`⚠️ University already has requiredCourses: ${uni.name}`);
-      }
+      // Always update requiredCourses
+      await universitiesCol.updateOne(
+        { _id: existing._id },
+        { $set: { requiredCourses: uni.requiredCourses } }
+      );
+      console.log(`🔁 Overwrote requiredCourses for: ${uni.name}`);
     }
   }
 
@@ -1069,7 +1082,8 @@ const run = async () => {
     }
   }
 
-  for (const course of newCourses) {
+  for (let index = 0; index < newCourses.length; index++) {
+    const course = newCourses[index];
     const uniId = uniMap[course.universityName];
     const profId = profMap[course.professorName];
     if (!uniId || !profId) continue;
@@ -1083,6 +1097,7 @@ const run = async () => {
 
     if (!exists) {
       await coursesCol.insertOne({
+        code: course.code || generateCourseCode(course.major, index),
         title: course.title,
         description: course.description,
         universityId: uniId,
@@ -1092,7 +1107,7 @@ const run = async () => {
         yearRecommended: course.yearRecommended,
         studentsEnrolled: []
       });
-      console.log(`✅ Added course: ${course.title}`);
+      console.log(`✅ Added course: ${course.code || generateCourseCode(course.major, index)} - ${course.title}`);
     } else {
       console.log(`⚠️ Course already exists: ${course.title}`);
     }

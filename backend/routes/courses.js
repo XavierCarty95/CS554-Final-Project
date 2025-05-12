@@ -79,7 +79,7 @@ router.get("/professor/:professorId", async (req, res) => {
 
 // POST /courses - create a new course
 router.post("/", async (req, res) => {
-  const { title, description, universityId, professorId } = req.body;
+  const { title, description = "", universityId, professorId } = req.body;
   try {
     const newCourse = await createCourse({
       title,

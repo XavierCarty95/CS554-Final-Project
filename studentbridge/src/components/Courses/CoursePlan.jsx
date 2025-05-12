@@ -56,7 +56,10 @@ const CoursePlan = () => {
           <label className="block mb-2 font-medium text-gray-700">University:</label>
           <select
             className="w-full border rounded p-2"
-            onChange={(e) => setSelectedUniversity(e.target.value)}
+            onChange={(e) => {
+              setSelectedUniversity(e.target.value);
+              setSelectedMajor(""); // reset major when university changes
+            }}
           >
             <option value="">Select</option>
             {Array.isArray(universities) &&
@@ -80,25 +83,34 @@ const CoursePlan = () => {
 
         {plan && (
           <div>
-            {Object.entries(plan).map(([year, semesters]) => (
-              <div key={year} className="mb-8">
-                <h3 className="text-2xl font-semibold text-gray-800 mb-4">{year}</h3>
-                <div className="grid md:grid-cols-2 gap-6 mt-4">
-                  {['Fall', 'Spring'].map((sem) => (
-                    <div key={sem} className="border p-4 rounded shadow bg-gray-50">
-                      <h4 className="font-semibold text-lg text-blue-600 mb-2">{sem}</h4>
-                      <ul>
-                        {(semesters[sem] || []).map((c) => (
-                          <li key={c.title} className="mb-1">
-                            <strong>{c.title}</strong> — {c.description}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
+            {Object.entries(plan).map(([year, semesters]) => {
+              const yearMap = {
+                year1: "Freshman",
+                year2: "Sophomore",
+                year3: "Junior",
+                year4: "Senior"
+              };
+              return (
+                <div key={year} className="mb-8">
+                  <h3 className="text-2xl font-semibold text-gray-800 mb-4">{yearMap[year] || year}</h3>
+                  <div className="grid md:grid-cols-2 gap-6 mt-4">
+                    {['Fall', 'Spring'].map((sem) => (
+                      <div key={sem} className="border p-4 rounded shadow bg-gray-50">
+                        <h4 className="font-semibold text-lg text-blue-600 mb-2">{sem}</h4>
+                        <ul>
+                          {(semesters[sem] || []).map((c) => (
+                            <li key={`${c.code || c.title}`} className="mb-1">
+                              <strong>{c.code ? `${c.code} - ` : ''}{c.title}</strong>
+                              {c.description ? ` — ${c.description}` : ''}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

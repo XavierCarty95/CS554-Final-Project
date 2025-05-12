@@ -44,9 +44,6 @@ router.get('/full-plan/:universityId/:major', async (req, res) => {
       return res.status(404).json({ error: "Course data is invalid" });
     }
 
-    console.log("📊 University:", university.name);
-    console.log("📚 Requested major:", major);
-    console.log("📌 Matching courses:");
     const majorCourses = university.requiredCourses.filter((c) => {
       const isMatch = c.major?.toLowerCase() === major.toLowerCase();
       if (isMatch) {

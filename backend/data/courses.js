@@ -64,8 +64,6 @@ export const createCourse = async ({
 }) => {
   if (!title || typeof title !== "string")
     throw new Error("Title is required and must be a string");
-  if (!description || typeof description !== "string")
-    throw new Error("Description is required and must be a string");
   if (!universityId || typeof universityId !== "string")
     throw new Error("University ID is required");
   if (!professorId || typeof professorId !== "string")
@@ -122,7 +120,7 @@ export const getCoursesForUniversityDropdown = async (universityId) => {
         ? new ObjectId(universityId)
         : universityId,
     })
-    .project({ _id: 1, title: 1 }) // only return minimal info for dropdown
+    .project({ _id: 1, title: 1 }) 
     .toArray();
   return courses;
 };
