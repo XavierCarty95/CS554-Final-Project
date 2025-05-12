@@ -24,6 +24,8 @@ import CourseList from "./components/Courses/CourseList";
 import CourseDetail from "./components/Courses/CourseDetail";
 import AddCourse from "./components/Courses/AddCourse";
 import CoursePlan from "./components/Courses/CoursePlan";
+import GroupList from "./components/groups/GroupList.jsx";
+import GroupPage from "./components/groups/GroupPage.jsx";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -196,20 +198,19 @@ function App() {
           }
         />
 
-<Route
-  path="/scheduler"
-  element={
-    <ProtectedRoute
-      isLoggedIn={isLoggedIn}
-      setIsLoggedIn={setIsLoggedIn}
-      setCurrentUser={setCurrentUser}
-    >
-      <CoursePlan />
-    </ProtectedRoute>
-  }
-/>
+        <Route
+          path="/scheduler"
+          element={
+            <ProtectedRoute
+              isLoggedIn={isLoggedIn}
+              setIsLoggedIn={setIsLoggedIn}
+              setCurrentUser={setCurrentUser}
+            >
+              <CoursePlan />
+            </ProtectedRoute>
+          }
+        />
 
-        
         <Route path="/courses" element={<CourseList />} />
         <Route path="/courses/:courseId" element={<CourseDetail />} />
         <Route path="/about" element={<About />} />
@@ -257,6 +258,30 @@ function App() {
               setCurrentUser={setCurrentUser}
             >
               <AddCourse />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/university/:universityId/groups"
+          element={
+            <ProtectedRoute
+              isLoggedIn={isLoggedIn}
+              setIsLoggedIn={setIsLoggedIn}
+              setCurrentUser={setCurrentUser}
+            >
+              <GroupList />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/university/:universityId/groups/:groupId"
+          element={
+            <ProtectedRoute
+              isLoggedIn={isLoggedIn}
+              setIsLoggedIn={setIsLoggedIn}
+              setCurrentUser={setCurrentUser}
+            >
+              <GroupPage />
             </ProtectedRoute>
           }
         />

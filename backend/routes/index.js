@@ -9,6 +9,7 @@ import coursesRoutes from "./courses.js";
 import chat_routes from "./chat_routes.js";
 import courseSchedulerRoutes from './courseScheduler.js';
 import dotenv from "dotenv";
+import group_routes from "./group_routes.js";
 dotenv.config();
 
 const constructorMethod = (app) => {
@@ -27,7 +28,8 @@ const constructorMethod = (app) => {
   app.use("/reviews", reviewsRoutes)
   app.use("/chat", chat_routes);
   app.use('/api/scheduler', courseSchedulerRoutes);
-  
+  app.use("/university/:universityId/groups", group_routes);
+
   app.use("*", (req, res) => {
     return res.status(404).json({ error: "Not found" });
   });
