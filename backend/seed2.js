@@ -21,6 +21,7 @@ async function main() {
       "posts",
       "chats",
       "chatrequests",
+      "users",
     ];
 
     console.log("Clearing existing collections (preserving users)...");
@@ -43,7 +44,7 @@ async function main() {
         overview:
           "A leading technology-focused university with strong computer science programs.",
         courses: [],
-        professors: [], 
+        professors: [],
         publicChatId: new ObjectId().toString(),
       },
       {
@@ -384,7 +385,7 @@ async function main() {
             title: courseTitle,
             description: `Comprehensive course covering ${courseTitle.toLowerCase()} principles and applications.`,
             universityId: universityId,
-            professorId: null, 
+            professorId: null,
             department: department,
             studentsEnrolled: [],
           });
