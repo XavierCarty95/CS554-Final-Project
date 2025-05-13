@@ -12,9 +12,9 @@ export default function Footer() {
           <NavLink to="/about" className="text-gray-500 hover:text-gray-800">
             About
           </NavLink>
-          <NavLink to="/contact" className="text-gray-500 hover:text-gray-800">
+          {/* <NavLink to="/contact" className="text-gray-500 hover:text-gray-800">
             Contact
-          </NavLink>
+          </NavLink> */}
           <NavLink to="/privacy" className="text-gray-500 hover:text-gray-800">
             Privacy Policy
           </NavLink>
