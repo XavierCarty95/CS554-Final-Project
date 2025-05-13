@@ -167,15 +167,19 @@ const GroupList = () => {
               {myGroups.length > 0 ? (
                 <ul className="space-y-4">
                   {myGroups.map((group) => (
-                    <li
-                      key={group._id}
-                      className="p-4 border rounded shadow-md"
+                    <Link
+                      to={`/university/${universityId}/groups/${group._id}`}
                     >
-                      <h3 className="text-lg font-semibold">
-                        {group.groupName}
-                      </h3>
-                      <p className="text-gray-600">{group.description}</p>
-                    </li>
+                      <li
+                        key={group._id}
+                        className="p-4 border rounded shadow-md"
+                      >
+                        <h3 className="text-lg font-semibold">
+                          {group.groupName}
+                        </h3>
+                        <p className="text-gray-600">{group.description}</p>
+                      </li>
+                    </Link>
                   ))}
                 </ul>
               ) : (

@@ -132,3 +132,48 @@ export const getGroupById = async (groupId) => {
     createdBy: createdBy,
   };
 };
+
+export const leaveGroup = async (groupId, userId) => {
+  isValidId(groupId, "Group ID");
+  isValidId(userId, "User ID");
+  const groupCollection = await groups();
+  const group = await groupCollection.findOneAndUpdate(
+    {
+      _id: new ObjectId(groupId),
+    },
+    { $pull: { members: new ObjectId(userId) } },
+    { returnDocument: "after" }
+  );
+  if (!group) {
+    throw new Error("Group not found");
+  }
+
+  const chatsCollection = await chats();
+  const chat = await chatsCollection.findOneAndUpdate(
+    {
+      groupId: new ObjectId(groupId),
+    },
+    { $pull: { members: new ObjectId(userId) } },
+    { returnDocument: "after" }
+  );
+  if (!chat) {
+    throw new Error("Chat not found");
+  }
+  if (group.createdBy.equals(new ObjectId(userId))) {
+    const groupCollection = await groups();
+    const deleteInfo = await groupCollection.deleteOne({
+      _id: new ObjectId(groupId),
+    });
+    if (deleteInfo.deletedCount === 0) {
+      throw new Error("Could not delete group");
+    }
+    const chatsCollection = await chats();
+    const deleteChatInfo = await chatsCollection.deleteOne({
+      groupId: new ObjectId(groupId),
+    });
+    if (deleteChatInfo.deletedCount === 0) {
+      throw new Error("Could not delete chat");
+    }
+  }
+  return group;
+};

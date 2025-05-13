@@ -4,6 +4,7 @@ import {
   getGroups,
   joinGroup,
   getGroupById,
+  leaveGroup,
 } from "../data/groups.js";
 const router = express.Router({ mergeParams: true });
 
@@ -86,6 +87,22 @@ router.get("/getGroupById", ensureAuthenticated, async (req, res) => {
   try {
     const group = await getGroupById(groupId);
     return res.status(200).json(group);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+router.get("/leaveGroup/:groupId", ensureAuthenticated, async (req, res) => {
+  const { groupId } = req.params;
+  const userId = req.session.user._id;
+
+  if (!groupId || !userId) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
+
+  try {
+    const updatedGroup = await leaveGroup(groupId, userId);
+    return res.status(200).json(updatedGroup);
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
