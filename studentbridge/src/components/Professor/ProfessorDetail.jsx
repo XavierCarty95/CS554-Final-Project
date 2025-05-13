@@ -163,7 +163,7 @@ function ProfessorDetailPage() {
         )}
         {averageRating && (
           <p className="text-yellow-600 mb-4 font-medium">
-            ⭐ Average Rating: {averageRating} / 5
+            ⭐ Average Rating: {averageRating}
           </p>
         )}
 
