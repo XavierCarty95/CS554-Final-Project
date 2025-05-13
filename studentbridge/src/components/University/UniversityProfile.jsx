@@ -17,6 +17,7 @@ const UniversityProfile = () => {
   const chatRefs = useRef({});
   const socketRef = useRef(null);
   const [publicChatId, setChatId] = useState(null);
+  const [showGroup, setShowGroup] = useState(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -98,6 +99,23 @@ const UniversityProfile = () => {
     fetchPublicChat();
   }, [universityId]);
 
+  useEffect(() => {
+    const checkIfStudent = async () => {
+      try {
+        const response = await axiosInstance.get(
+          `/university/${universityId}/groups/isStudent`
+        );
+        if (response.status === 200) {
+          setShowGroup(response.data.isStudent);
+        }
+      } catch (error) {
+        console.error("Error checking if user is a student:", error);
+      }
+    };
+
+    checkIfStudent();
+  }, [universityId]);
+
   const navigateToForums = () => {
     navigate(`/university/${universityId}/forums`);
   };
@@ -153,6 +171,17 @@ const UniversityProfile = () => {
             </Link>
           </div>
         </div>
+        {showGroup && (
+          <div className="border rounded-lg p-4 bg-white shadow-sm col-span-2">
+            <h3 className="text-lg font-semibold mb-3">Looking for Groups?</h3>
+            <button
+              onClick={() => navigate(`/university/${universityId}/groups/`)}
+              className="w-full py-2 bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors"
+            >
+              Browse Groups
+            </button>
+          </div>
+        )}
         <div className="border rounded-lg p-4 bg-white shadow-sm w-full col-span-2">
           <h3 className="text-lg font-semibold mb-3">Chat Room</h3>
           <div

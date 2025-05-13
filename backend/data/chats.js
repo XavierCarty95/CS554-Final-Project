@@ -175,9 +175,39 @@ export const isChatExists = async (senderId, receipentId) => {
     members: { $all: ids },
     type: "personal",
   });
- 
+
   if (!chat) {
     return false;
   }
   return true;
+};
+
+export const fetchGroupChat = async (userId) => {
+  isValidId(userId, "userId");
+  const chatCollection = await chats();
+  let chatList = await chatCollection
+    .find({ members: { $in: [new ObjectId(userId)] }, type: "group" })
+    .toArray();
+  if (!chatList) {
+    throw new Error("No group chats found");
+  }
+  const userCollection = await users();
+  chatList = await Promise.all(
+    chatList.map(async (chat) => {
+      const populatedMembers = await Promise.all(
+        chat.members.map(async (memberId) => {
+          const member = await userCollection.findOne({
+            _id: new ObjectId(memberId),
+          });
+          if (memberId.toString() === userId) {
+            chat.senderName = member.name;
+            chat.senderId = memberId;
+          }
+          return member;
+        })
+      );
+      return { ...chat, members: populatedMembers };
+    })
+  );
+  return chatList;
 };
