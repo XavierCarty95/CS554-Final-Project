@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axiosInstance from "../config/axiosConfig";
 import { useNavigate } from "react-router-dom";
+import Footer from "./Footer";
 
 function Signup(props) {
   const [formData, setFormData] = useState({
@@ -74,122 +75,125 @@ function Signup(props) {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md p-8 bg-white rounded shadow-md">
-        <h2 className="mb-6 text-2xl font-bold text-center text-gray-700">
-          Signup
-        </h2>
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block mb-2 text-sm font-medium text-gray-600">
-              Name
-            </label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-              placeholder="Enter your name"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block mb-2 text-sm font-medium text-gray-600">
-              Email
-            </label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-              placeholder="Enter your email"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block mb-2 text-sm font-medium text-gray-600">
-              Password
-            </label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-              placeholder="Enter your password"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block mb-2 text-sm font-medium text-gray-600">
-              Confirm Password
-            </label>
-            <input
-              type="password"
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-              placeholder="Confirm your password"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block mb-2 text-sm font-medium text-gray-600">
-              Role
-            </label>
-            <select
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-              required
-            >
-              <option value="" disabled hidden>
-                Select your role
-              </option>
-              <option value="student">Student</option>
-              <option value="incoming">Incoming Student</option>
-              {/* <option value="professor">Professor</option> */}
-            </select>
-          </div>
-          {formData.role === "student" || formData.role === "professor" ? (
+    <div className="flex flex-col min-h-screen bg-gray-100">
+      <main className="flex items-center justify-center min-h-screen bg-gray-100">
+        <div className="w-full max-w-md p-8 bg-white rounded shadow-md">
+          <h2 className="mb-6 text-2xl font-bold text-center text-gray-700">
+            Signup
+          </h2>
+          <form onSubmit={handleSubmit}>
             <div className="mb-4">
               <label className="block mb-2 text-sm font-medium text-gray-600">
-                University Name
+                Name
+              </label>
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                placeholder="Enter your name"
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block mb-2 text-sm font-medium text-gray-600">
+                Email
+              </label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                placeholder="Enter your email"
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block mb-2 text-sm font-medium text-gray-600">
+                Password
+              </label>
+              <input
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                placeholder="Enter your password"
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block mb-2 text-sm font-medium text-gray-600">
+                Confirm Password
+              </label>
+              <input
+                type="password"
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                placeholder="Confirm your password"
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block mb-2 text-sm font-medium text-gray-600">
+                Role
               </label>
               <select
-                name="university"
-                value={formData.university}
+                name="role"
+                value={formData.role}
                 onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
                 required
               >
                 <option value="" disabled hidden>
-                  Select your university
+                  Select your role
                 </option>
-                {universities.map((universityMap) => (
-                  <option key={universityMap._id} value={universityMap._id}>
-                    {universityMap.name}
-                  </option>
-                ))}
+                <option value="student">Student</option>
+                <option value="incoming">Incoming Student</option>
+                {/* <option value="professor">Professor</option> */}
               </select>
             </div>
-          ) : null}
+            {formData.role === "student" || formData.role === "professor" ? (
+              <div className="mb-4">
+                <label className="block mb-2 text-sm font-medium text-gray-600">
+                  University Name
+                </label>
+                <select
+                  name="university"
+                  value={formData.university}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  required
+                >
+                  <option value="" disabled hidden>
+                    Select your university
+                  </option>
+                  {universities.map((universityMap) => (
+                    <option key={universityMap._id} value={universityMap._id}>
+                      {universityMap.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ) : null}
 
-          <button
-            type="submit"
-            className="w-full px-4 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
-          >
-            Signup
-          </button>
-          {errorMessage && (
-            <div className="mb-4 text-sm text-red-600">{errorMessage}</div>
-          )}
-        </form>
-      </div>
+            <button
+              type="submit"
+              className="w-full px-4 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            >
+              Signup
+            </button>
+            {errorMessage && (
+              <div className="mb-4 text-sm text-red-600">{errorMessage}</div>
+            )}
+          </form>
+        </div>
+      </main>
+      <Footer />
     </div>
   );
 }
