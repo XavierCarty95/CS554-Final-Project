@@ -3,6 +3,7 @@ import SearchBar from "./SearchBar";
 import "../App.css";
 import { NavLink } from "react-router-dom";
 import { University, MessageCircle, Calendar, Star } from "lucide-react";
+import Footer from "./Footer";
 
 const features = [
   {
@@ -68,8 +69,9 @@ function Home() {
           </div>
         </div>
       </section>
+      <Footer />
 
-      <footer className="footer bg-white py-10">
+      {/* <footer className="footer bg-white py-10">
         <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-500 mb-4 md:mb-0">
             &copy; {new Date().getFullYear()} Student Bridge. All rights
@@ -93,7 +95,7 @@ function Home() {
             </NavLink>
           </div>
         </div>
-      </footer>
+      </footer> */}
     </main>
   );
 }
