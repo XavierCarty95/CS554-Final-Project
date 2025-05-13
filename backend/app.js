@@ -35,7 +35,24 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(cors());
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://ec2-18-188-192-217.us-east-2.compute.amazonaws.com:5173",
+  process.env.FRONTEND_URL,
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
 
 const initialiseFirebase = firebaseAuth;
 
