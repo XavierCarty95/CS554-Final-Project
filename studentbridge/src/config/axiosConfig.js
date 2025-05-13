@@ -1,11 +1,10 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:3000",
+  baseURL: import.meta.env.NODE_URL || "http://localhost:3000",
   timeout: 3600,
   headers: {
     "Content-Type": "application/json",
-    "Access-Control-Allow-Origin": "*",
   },
   withCredentials: true,
 });
