@@ -1,7 +1,5 @@
-// src/components/Forum/NewThreadForm.jsx
 import React, { useState } from "react";
 
-// Predefined list of tags that users can choose from
 const AVAILABLE_TAGS = [
   "Academics",
   "Advice",
@@ -30,13 +28,6 @@ export default function NewThreadForm({ onSubmit }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!title.trim()) return;
-
-    console.log(
-      "Creating new thread with title:",
-      title,
-      "and tags:",
-      selectedTags
-    );
 
     onSubmit(title, selectedTags);
     setTitle("");

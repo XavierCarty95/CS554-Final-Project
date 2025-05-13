@@ -1,11 +1,11 @@
 import express from "express";
 import * as usersData from "../data/users.js";
-// import * as forums from "../data/forums.js";
-// import * as posts from "../data/posts.js";
-import { forums, posts } from "../config/mongoCollections.js";
+import { forums, posts, users } from "../config/mongoCollections.js";
 import { ObjectId } from "mongodb";
+import { strCheck, validateName } from "../helpers.js";
 
 const router = express.Router();
+
 router.get("/:userId", async (req, res) => {
   try {
     const user = await usersData.getUserById(req.params.userId);
@@ -21,13 +21,10 @@ router.get("/:userId", async (req, res) => {
   }
 });
 
-// routes/user_routes.js (add these routes)
 router.get("/:userId/forums", async (req, res) => {
   try {
     const { userId } = req.params;
 
-    // Convert userId to ObjectId if valid
-    console.log("userId from user_routes for users/forums:", userId);
     let userIdObj;
     try {
       userIdObj = ObjectId.isValid(userId) ? new ObjectId(userId) : userId;
@@ -41,8 +38,6 @@ router.get("/:userId/forums", async (req, res) => {
       .sort({ createdAt: -1 })
       .toArray();
 
-    console.log("userForums:", userForums);
-
     return res.json(userForums);
   } catch (error) {
     console.error("Error getting user forums:", error);
@@ -53,9 +48,6 @@ router.get("/:userId/forums", async (req, res) => {
 router.get("/:userId/posts", async (req, res) => {
   try {
     const { userId } = req.params;
-
-    // Convert userId to ObjectId if valid
-    console.log("userId from user_routes for users/posts:", userId);
 
     let userIdObj;
     try {
@@ -70,13 +62,11 @@ router.get("/:userId/posts", async (req, res) => {
       .sort({ createdAt: -1 })
       .toArray();
 
-    // Get forum info for each post
     const forumsCollection = await forums();
     for (const post of userPosts) {
       const forum = await forumsCollection.findOne({ _id: post.forumId });
       post.forumTitle = forum ? forum.title : "Unknown Forum";
     }
-    console.log("userPosts with forum titles:", userPosts);
 
     return res.json(userPosts);
   } catch (error) {
@@ -84,5 +74,83 @@ router.get("/:userId/posts", async (req, res) => {
     return res.status(500).json({ error: "Failed to retrieve user posts" });
   }
 });
+
+router.put("/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { name, email, major, year } = req.body;
+
+    if (!req.session.user || req.session.user._id !== userId) {
+      console.log("Unauthorized update attempt");
+      return res
+        .status(403)
+        .json({ error: "Unauthorized to update this profile" });
+    }
+
+    try {
+      strCheck(name, "Name");
+      validateName(name);
+
+      validateEmail(email);
+    } catch (validationError) {
+      return res.status(400).json({ error: validationError.message });
+    }
+
+    let userCollection = await users();
+    const updateData = {
+      name,
+      email,
+      profile: {
+        major: major || "",
+        year: year || "",
+      },
+    };
+
+    let userIdObj;
+    try {
+      userIdObj = ObjectId.isValid(userId) ? new ObjectId(userId) : userId;
+    
+    } catch (e) {
+      console.error("Invalid userId format:", e);
+      userIdObj = userId;
+    }
+
+    const existingUser = await userCollection.findOne({ _id: userIdObj });
+    if (!existingUser) {
+      return res.status(404).json({ error: "User not found in database" });
+    }
+
+    const updatedUser = await userCollection.findOneAndUpdate(
+      { _id: userIdObj },
+      { $set: updateData },
+      { returnDocument: "after" }
+    );
+
+    return res.json({
+      ...updatedUser,
+      _id: updatedUser._id.toString(),
+    });
+  } catch (error) {
+    console.error("Error updating user:", error);
+    return res
+      .status(500)
+      .json({ error: "Failed to update user profile: " + error.message });
+  }
+});
+
+function validateEmail(email) {
+  if (!email || typeof email !== "string") {
+    throw new Error("Email must be a non-empty string");
+  }
+  email = email.trim();
+  if (email.length === 0) {
+    throw new Error("Email cannot be empty or just spaces");
+  }
+  const emailRegex = /^[\w\.-]+@[\w\.-]+\.\w+$/;
+  if (!emailRegex.test(email)) {
+    throw new Error("Invalid email format");
+  }
+  return email;
+}
 
 export default router;

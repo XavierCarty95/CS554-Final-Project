@@ -7,12 +7,11 @@ import {
   createCourse,
   deleteCourseById,
   searchCourses,
-  getCoursesForUniversityDropdown 
+  getCoursesForUniversityDropdown,
 } from "../data/courses.js";
 
 const router = express.Router();
 
-// GET /courses - list all courses
 router.get("/", async (req, res) => {
   try {
     const courses = await getAllCourses();
@@ -23,22 +22,28 @@ router.get("/", async (req, res) => {
   }
 });
 
-// GET /courses/search?q=term - text search on title/description
 router.get("/search", async (req, res) => {
-  const q = req.query.q || "";
-  if (!q) {
-    return res.status(400).json({ error: "Search query is required" });
-  }
   try {
-    const results = await searchCourses(q);
-    res.json(results);
-  } catch (err) {
-    console.error("Error searching courses:", err);
-    res.status(500).json({ error: "Internal server error" });
+    const query = req.query.q?.toLowerCase() || "";
+    const coursesCollection = await courses(); // Now this will work
+
+    const results = await coursesCollection
+      .find({
+        $or: [
+          { title: { $regex: query, $options: "i" } },
+          { description: { $regex: query, $options: "i" } },
+        ],
+      })
+      .limit(20)
+      .toArray();
+
+    return res.json(results);
+  } catch (e) {
+    console.error("Search error:", e);
+    return res.status(500).json({ error: "Failed to search courses" });
   }
 });
 
-// GET /courses/:id - get course by ID
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
   try {
@@ -50,7 +55,6 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// GET /courses/university/:universityId - courses for a university
 router.get("/university/:universityId", async (req, res) => {
   const { universityId } = req.params;
   try {
@@ -65,7 +69,6 @@ router.get("/university/:universityId", async (req, res) => {
   }
 });
 
-// GET /courses/professor/:professorId - courses taught by a professor
 router.get("/professor/:professorId", async (req, res) => {
   const { professorId } = req.params;
   try {
@@ -77,7 +80,6 @@ router.get("/professor/:professorId", async (req, res) => {
   }
 });
 
-// POST /courses - create a new course
 router.post("/", async (req, res) => {
   const { title, description = "", universityId, professorId } = req.body;
   try {
@@ -111,10 +113,12 @@ router.get("/university/:universityId/dropdown", async (req, res) => {
     const courses = await getCoursesForUniversityDropdown(universityId);
     res.json(courses);
   } catch (err) {
-    console.error(`Error fetching dropdown courses for university ${universityId}:`, err);
+    console.error(
+      `Error fetching dropdown courses for university ${universityId}:`,
+      err
+    );
     res.status(400).json({ error: err.message || "Failed to fetch courses" });
   }
 });
-
 
 export default router;

@@ -1,4 +1,3 @@
-// src/components/University/UniversityProfile.jsx
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import axiosInstance from "../../config/axiosConfig";
@@ -148,9 +147,9 @@ const UniversityProfile = () => {
             <li>Courses: {university.courses?.length || 0}</li>
           </ul>
         </div>
-
+        {/* In UniversityProfile.jsx - Add this to the Resources section */}
         <div className="border rounded-lg p-4 bg-white shadow-sm">
-          <h3 className="text-lg font-semibold mb-3">Resources</h3>
+          <h2 className="text-lg font-semibold mb-3">Resources</h2>
           <div className="space-y-3">
             <button
               onClick={navigateToForums}
@@ -158,12 +157,18 @@ const UniversityProfile = () => {
             >
               Discussion Forums
             </button>
-            <button
-              onClick={() => navigate(`/university/${universityId}/professors`)}
-              className="w-full py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+            <Link
+              to={`/university/${universityId}/professors`}
+              className="block w-full py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors text-center"
             >
-              Rate My Professors
-            </button>
+              View Professors
+            </Link>
+            <Link
+              to={`/university/${universityId}/courses`}
+              className="block w-full py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors text-center"
+            >
+              View Courses
+            </Link>
           </div>
         </div>
         {showGroup && (

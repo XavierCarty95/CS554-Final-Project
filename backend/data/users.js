@@ -104,7 +104,7 @@ export const loginUser = async (email, password) => {
       password
     );
 
-    // console.log("User credential:", userCredential);
+
 
     const user = await userCollection.findOne({
       email: email,
@@ -126,12 +126,12 @@ export const getUserById = async (userId) => {
   if (!ObjectId.isValid(new ObjectId(userId))) {
     throw new Error("Invalid user ID");
   }
-  console.log("Fetching user with ID:", userId);
 
   let userCollection = await users();
   const user = await userCollection.findOne({
     _id: new ObjectId(userId),
   });
+
 
   if (!user) {
     throw new Error("User not found");

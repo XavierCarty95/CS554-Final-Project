@@ -1,11 +1,9 @@
-// src/components/Forum/ForumThread.jsx
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { getPosts, createPost } from "../../services/forumServices";
 import ForumPost from "./ForumPost";
 
 export default function ForumThread({ forum, universityId }) {
-  // Accept universityId prop
   const [posts, setPosts] = useState([]);
   const [newReply, setNewReply] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -19,9 +17,8 @@ export default function ForumThread({ forum, universityId }) {
     }
 
     setIsLoading(true);
-    getPosts(forum._id, forum.universityId) // Pass universityId to getPosts
+    getPosts(forum._id, forum.universityId) 
       .then((data) => {
-        console.log("Posts loaded:", data);
         setPosts(data);
         setIsLoading(false);
       })
@@ -29,7 +26,7 @@ export default function ForumThread({ forum, universityId }) {
         console.error("Error loading posts:", err);
         setIsLoading(false);
       });
-  }, [forum._id, forum.universityId]); // Add forum.universityId to dependencies
+  }, [forum._id, forum.universityId]); 
 
   const handleSubmitReply = async (e) => {
     e.preventDefault();

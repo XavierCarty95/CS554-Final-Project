@@ -19,13 +19,11 @@ export default function ForumPage() {
     }
 
     setIsLoading(true);
-    console.log("University ID from params:", universityId);
 
     getForums(universityId)
       .then((data) => {
-        console.log("Forums loaded:", data);
         setForums(data);
-        setFilteredForums(data); // Initialize filtered forums with all forums
+        setFilteredForums(data);
         setIsLoading(false);
       })
       .catch((err) => {
@@ -35,16 +33,55 @@ export default function ForumPage() {
       });
   }, [universityId]);
 
+  // Function to filter forums based on search tags
+  const filterForumsByTags = (forums, searchValue) => {
+    if (searchValue.trim() === "") {
+      return forums;
+    }
+
+    const searchInput = searchValue.toLowerCase().trim();
+
+    return forums.filter((forum) => {
+      if (!forum.tags || forum.tags.length === 0) return false;
+
+      // Check if any tag starts with the search input
+      return forum.tags.some((tag) =>
+        tag.toLowerCase().startsWith(searchInput)
+      );
+    });
+  };
+
   const handleNewThread = async (title, tags) => {
+    // Validate title
+    if (title.trim().length < 5) {
+      alert("Title must be at least 5 characters long");
+      return;
+    }
+
+    if (title.trim().length > 150) {
+      alert("Title must be at most 150 characters long");
+      return;
+    }
+
+    if (!/[a-zA-Z]/.test(title)) {
+      alert("Title must contain at least one letter");
+      return;
+    }
+
     try {
-      console.log("Creating new forum with title:", title, "and tags:", tags);
+      // Proceed with form submission
       const newForum = await createForum({
         title,
         universityId,
         tags,
       });
-      setForums((prev) => [newForum, ...prev]);
-      setFilteredForums((prev) => [newForum, ...prev]); // Update filtered forums too
+
+      // Update both forums and filteredForums states
+      const updatedForums = [newForum, ...forums];
+      setForums(updatedForums);
+
+      // Apply current search filter to the updated forums list
+      setFilteredForums(filterForumsByTags(updatedForums, searchTags));
     } catch (err) {
       console.error("Error creating forum:", err);
       alert(err.response?.data?.error || "Failed to create forum");
@@ -54,29 +91,7 @@ export default function ForumPage() {
   const handleSearchChange = (e) => {
     const value = e.target.value;
     setSearchTags(value);
-
-    if (value.trim() === "") {
-      setFilteredForums(forums); // Show all forums when search is empty
-      return;
-    }
-
-    // Split the search input by commas and clean up each tag
-    const searchTagsArray = value
-      .toLowerCase()
-      .split(",")
-      .map((tag) => tag.trim())
-      .filter((tag) => tag !== "");
-
-    // Filter forums that have at least one matching tag
-    const filtered = forums.filter((forum) => {
-      if (!forum.tags || forum.tags.length === 0) return false;
-      const forumTagsLower = forum.tags.map((tag) => tag.toLowerCase());
-      return searchTagsArray.some((searchTag) =>
-        forumTagsLower.includes(searchTag)
-      );
-    });
-
-    setFilteredForums(filtered);
+    setFilteredForums(filterForumsByTags(forums, value));
   };
 
   if (isLoading)

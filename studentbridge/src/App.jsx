@@ -1,6 +1,6 @@
 import { NavLink, Routes, Route } from "react-router-dom";
 import { useEffect, useState } from "react";
-import "./App.css";
+// import "./App.css";
 import "./tailwind.css";
 import Home from "./components/Home";
 import Login from "./components/Login";
@@ -24,6 +24,7 @@ import CourseList from "./components/Courses/CourseList";
 import CourseDetail from "./components/Courses/CourseDetail";
 import AddCourse from "./components/Courses/AddCourse";
 import CoursePlan from "./components/Courses/CoursePlan";
+import UniversityCourses from "./components/University/UniversityCourses.jsx";
 import GroupList from "./components/groups/GroupList.jsx";
 import GroupPage from "./components/groups/GroupPage.jsx";
 
@@ -39,22 +40,21 @@ function App() {
           .then((response) => {
             if (response.status === 200) {
               setIsLoggedIn(true);
-              setCurrentUser(response.data); // store user info
+              setCurrentUser(response.data);
             }
           })
-          // eslint-disable-next-line no-unused-vars
-          .catch((error) => {
+          .catch(() => {
             setIsLoggedIn(false);
             setCurrentUser(null);
           });
-        // eslint-disable-next-line no-unused-vars
+      // eslint-disable-next-line no-unused-vars
       } catch (error) {
         setIsLoggedIn(false);
         setCurrentUser(null);
       }
     };
     verifyLogin();
-  }, [isLoggedIn]);
+  }, []); // Remove isLoggedIn from here
 
   return (
     <div className="App">
@@ -174,6 +174,18 @@ function App() {
           }
         />
         <Route
+          path="/professors/:professorId"
+          element={
+            <ProtectedRoute
+              isLoggedIn={isLoggedIn}
+              setIsLoggedIn={setIsLoggedIn}
+              setCurrentUser={setCurrentUser}
+            >
+              <ProfessorDetailPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/university/:universityId/forums"
           element={
             <ProtectedRoute
@@ -197,7 +209,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/scheduler"
           element={
@@ -210,9 +221,30 @@ function App() {
             </ProtectedRoute>
           }
         />
-
-        <Route path="/courses" element={<CourseList />} />
-        <Route path="/courses/:courseId" element={<CourseDetail />} />
+        <Route
+          path="/courses"
+          element={
+            <ProtectedRoute
+              isLoggedIn={isLoggedIn}
+              setIsLoggedIn={setIsLoggedIn}
+              setCurrentUser={setCurrentUser}
+            >
+              <CourseList />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/courses/:courseId"
+          element={
+            <ProtectedRoute
+              isLoggedIn={isLoggedIn}
+              setIsLoggedIn={setIsLoggedIn}
+              setCurrentUser={setCurrentUser}
+            >
+              <CourseDetail />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/about" element={<About />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/contact" element={<Contact />} />
@@ -258,6 +290,30 @@ function App() {
               setCurrentUser={setCurrentUser}
             >
               <AddCourse />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/course-plan"
+          element={
+            <ProtectedRoute
+              isLoggedIn={isLoggedIn}
+              setIsLoggedIn={setIsLoggedIn}
+              setCurrentUser={setCurrentUser}
+            >
+              <CoursePlan />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/university/:universityId/courses"
+          element={
+            <ProtectedRoute
+              isLoggedIn={isLoggedIn}
+              setIsLoggedIn={setIsLoggedIn}
+              setCurrentUser={setCurrentUser}
+            >
+              <UniversityCourses />
             </ProtectedRoute>
           }
         />

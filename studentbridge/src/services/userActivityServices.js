@@ -1,4 +1,4 @@
-// src/services/userActivityServices.js
+
 import axiosInstance from "../config/axiosConfig";
 
 export async function getUserForumActivity(userId) {

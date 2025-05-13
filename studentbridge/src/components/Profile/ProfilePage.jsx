@@ -1,4 +1,3 @@
-// src/components/Profile/ProfilePage.jsx
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { getUserById } from "../../services/userServices";
@@ -22,14 +21,29 @@ export default function ProfilePage() {
   const [forums, setForums] = useState([]);
   const [posts, setPosts] = useState([]);
   const [activityLoading, setActivityLoading] = useState(true);
+  // eslint-disable-next-line no-unused-vars
   const [chatExists, setChatExists] = useState(false);
+  // eslint-disable-next-line no-unused-vars
   const [courses, setCourses] = useState([]);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editFormData, setEditFormData] = useState({
+    name: "",
+    email: "",
+    major: "",
+    year: "",
+  });
 
   useEffect(() => {
     setIsLoading(true);
     getUserById(userId)
       .then((data) => {
         setProfileUser(data);
+        setEditFormData({
+          name: data.name || "",
+          email: data.email || "",
+          major: data.profile?.major || "",
+          year: data.profile?.year || "",
+        });
         setIsLoading(false);
       })
       // eslint-disable-next-line no-unused-vars
@@ -54,32 +68,16 @@ export default function ProfilePage() {
           setUniversityName(res.data.name);
         });
     }
-
     if (profileUser?.role === "professor") {
-      console.log(
-        "Checking if current user is same as professor:",
-        currentUser?._id === profileUser._id,
-        "Current:",
-        currentUser?._id,
-        "Profile:",
-        profileUser._id
-      );
       getCoursesByProfessor(profileUser._id)
         .then((data) => setCourses(data))
         .catch((err) => console.error("Error loading courses:", err));
     }
+  }, [profileUser]);
 
-    console.log("Profile User:", profileUser);
-    console.log("universityName:", universityName);
-  }, [profileUser, currentUser]);
-
-  // Fetch user activity
   useEffect(() => {
     if (profileUser) {
       setActivityLoading(true);
-
-      // Fetch forums created by user
-      console.log("Fetching forums for user:", userId);
       getUserForumActivity(userId)
         .then((data) => {
           setForums(data);
@@ -87,8 +85,6 @@ export default function ProfilePage() {
         .catch((err) => {
           console.error("Error loading forums:", err);
         });
-
-      // Fetch posts created by user
       getUserPostActivity(userId)
         .then((data) => {
           setPosts(data);
@@ -98,11 +94,48 @@ export default function ProfilePage() {
           console.error("Error loading posts:", err);
           setActivityLoading(false);
         });
-
-      console.log("Forums:", forums);
-      console.log("Posts:", posts);
     }
   }, [profileUser, userId]);
+
+  const handleEditToggle = () => {
+    setIsEditing(!isEditing);
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setEditFormData({
+      ...editFormData,
+      [name]: value,
+    });
+  };
+
+  const handleSaveProfile = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axiosInstance.put(
+        `/users/${userId}`,
+        editFormData
+      );
+      setProfileUser(response.data);
+      setIsEditing(false);
+      alert("Profile updated successfully!");
+    } catch (err) {
+      console.error("Error updating profile:", err);
+      if (err.response) {
+        alert(
+          `Failed to update profile: ${
+            err.response.data.error || "Unknown server error"
+          }`
+        );
+      } else if (err.request) {
+        alert(
+          "Failed to update profile: No response from server. Please check your connection."
+        );
+      } else {
+        alert(`Failed to update profile: ${err.message}`);
+      }
+    }
+  };
 
   if (isLoading)
     return <div className="p-4 text-center">Loading profile...</div>;
@@ -110,25 +143,6 @@ export default function ProfilePage() {
   if (!profileUser) return null;
 
   const isOwnProfile = currentUser && currentUser._id === profileUser._id;
-
-  const checkChatExists = async () => {
-    try {
-      const response = await axiosInstance.post("/chat/chatexists", {
-        senderId: currentUser._id,
-        receipentId: profileUser._id,
-      });
-      if (response.data) {
-        setChatExists(response.data);
-      } else {
-        setChatExists(false);
-        setShowRequestChat(true);
-      }
-    } catch (error) {
-      console.error("Error checking chat existence:", error);
-    }
-  };
-
-  // Format date for display
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
@@ -138,19 +152,8 @@ export default function ProfilePage() {
     });
   };
 
-  // Handle deleting a course (professor only)
-  const handleDeleteCourse = async (courseId) => {
-    try {
-      await axiosInstance.delete(`/courses/${courseId}`);
-      setCourses(prev => prev.filter(c => c._id !== courseId));
-    } catch (err) {
-      console.error("Failed to delete course", err);
-    }
-  };
-
   return (
     <div className="max-w-4xl mx-auto p-6">
-      {/* Header section - unchanged */}
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
         <div className="h-40 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
 
@@ -180,31 +183,20 @@ export default function ProfilePage() {
             </div>
 
             {isOwnProfile ? (
-              <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
-                Edit Profile
+              <button
+                onClick={handleEditToggle}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+              >
+                {isEditing ? "Cancel" : "Edit Profile"}
               </button>
             ) : (
-              <>
-                {chatExists ? (
-                  <Link
-                    to={`/chats`}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-                  >
-                    Chat
-                  </Link>
-                ) : (
-                  <button
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-                    onClick={() => {
-                      checkChatExists();
-                    }}
-                  >
-                    Message
-                  </button>
-                )}
-              </>
+              <button
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+                onClick={() => setShowRequestChat(true)}
+              >
+                Message
+              </button>
             )}
-
             {showRequestChat && (
               <RequestChat
                 senderId={currentUser._id}
@@ -225,30 +217,98 @@ export default function ProfilePage() {
         <div className="md:col-span-1">
           <div className="bg-white rounded-lg shadow-md p-6">
             <h2 className="text-xl font-semibold mb-4">About</h2>
-            <div className="space-y-4">
-              <div>
-                <h3 className="text-sm text-gray-500 font-medium">Email</h3>
-                <p className="text-gray-800">{profileUser.email}</p>
-              </div>
-              <div>
-                <h3 className="text-sm text-gray-500 font-medium">
-                  University
-                </h3>
-                <p className="text-gray-800">{universityName || "N/A"}</p>
-              </div>
-              {profileUser.profile?.major && (
+            {isEditing && isOwnProfile ? (
+              <form onSubmit={handleSaveProfile} className="space-y-4">
                 <div>
-                  <h3 className="text-sm text-gray-500 font-medium">Major</h3>
-                  <p className="text-gray-800">{profileUser.profile.major}</p>
+                  <label className="block text-sm text-gray-500 font-medium mb-1">
+                    Name
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={editFormData.name}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-300"
+                    required
+                  />
                 </div>
-              )}
-              {profileUser.profile?.year && (
                 <div>
-                  <h3 className="text-sm text-gray-500 font-medium">Year</h3>
-                  <p className="text-gray-800">{profileUser.profile.year}</p>
+                  <label className="block text-sm text-gray-500 font-medium mb-1">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={editFormData.email}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-300"
+                    required
+                    readOnly
+                  />
                 </div>
-              )}
-            </div>
+                {profileUser.role === "student" && (
+                  <>
+                    <div>
+                      <label className="block text-sm text-gray-500 font-medium mb-1">
+                        Major
+                      </label>
+                      <input
+                        type="text"
+                        name="major"
+                        value={editFormData.major}
+                        onChange={handleInputChange}
+                        className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-300"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-500 font-medium mb-1">
+                        Year
+                      </label>
+                      <input
+                        type="text"
+                        name="year"
+                        value={editFormData.year}
+                        onChange={handleInputChange}
+                        className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-300"
+                      />
+                    </div>
+                  </>
+                )}
+                <div className="flex justify-end">
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                  >
+                    Save Profile
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-sm text-gray-500 font-medium">Email</h3>
+                  <p className="text-gray-800">{profileUser.email}</p>
+                </div>
+                <div>
+                  <h3 className="text-sm text-gray-500 font-medium">
+                    University
+                  </h3>
+                  <p className="text-gray-800">{universityName || "N/A"}</p>
+                </div>
+                {profileUser.profile?.major && (
+                  <div>
+                    <h3 className="text-sm text-gray-500 font-medium">Major</h3>
+                    <p className="text-gray-800">{profileUser.profile.major}</p>
+                  </div>
+                )}
+                {profileUser.profile?.year && (
+                  <div>
+                    <h3 className="text-sm text-gray-500 font-medium">Year</h3>
+                    <p className="text-gray-800">{profileUser.profile.year}</p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
@@ -256,38 +316,6 @@ export default function ProfilePage() {
         <div className="md:col-span-2">
           <div className="bg-white rounded-lg shadow-md p-6">
             <h2 className="text-xl font-semibold mb-4">User Activity</h2>
-
-            {profileUser.role === "professor"  && (
-              <div className="mb-6">
-                <h3 className="text-lg font-medium mb-3">Courses Taught</h3>
-               {currentUser && currentUser.role === "professor" && currentUser._id === profileUser._id && (
-                  <div className="mb-4">
-                    <Link
-                      to={`/add-course`}
-                      className="inline-block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
-                    >
-                      Add New Course
-                    </Link>
-                  </div>
-                )}
-                <ul className="space-y-2">
-                  {courses.map((course) => (
-                    <li key={course._id} className="border p-3 rounded bg-gray-100">
-                      <h4 className="font-semibold">{course.title}</h4>
-                      <p className="text-sm text-gray-700">{course.description}</p>
-                      {currentUser && currentUser.role === "professor" && currentUser._id === profileUser._id && (
-                        <button
-                          onClick={() => handleDeleteCourse(course._id)}
-                          className="text-red-600 text-sm ml-2 hover:underline"
-                        >
-                          Delete
-                        </button>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
 
             {activityLoading ? (
               <div className="text-center p-4">Loading activity...</div>

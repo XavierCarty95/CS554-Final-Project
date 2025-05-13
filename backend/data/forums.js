@@ -1,4 +1,3 @@
-
 import { forums, users } from "../config/mongoCollections.js";
 import { ObjectId } from "mongodb";
 import { getRedisClient } from "../config/connectRedis.js";
@@ -7,7 +6,6 @@ export const getForumsByUniversity = async (universityId) => {
   if (!universityId || typeof universityId !== "string") {
     throw new Error("Invalid university ID");
   }
-
 
   try {
     const redisClient = getRedisClient();
@@ -20,7 +18,6 @@ export const getForumsByUniversity = async (universityId) => {
   } catch (error) {
     console.error("Redis error in getForumsByUniversity:", error);
   }
-
 
   const forumsCollection = await forums();
   let uniIdQuery;
@@ -51,7 +48,6 @@ export const getForumsByUniversity = async (universityId) => {
     const author = await userCollection.findOne({ _id: createdByObj });
     forum.authorName = author ? author.name : "Unknown User";
   }
-
 
   try {
     const redisClient = getRedisClient();
@@ -114,6 +110,18 @@ export const createForum = async (universityId, title, tags, createdBy) => {
   }
 
   title = title.trim();
+
+  if (title.length < 5) {
+    throw new Error("Title must be at least 5 characters long");
+  }
+
+  if (title.length > 150) {
+    throw new Error("Title must be at most 150 characters long");
+  }
+
+  if (!/[a-zA-Z]/.test(title)) {
+    throw new Error("Title must contain at least one letter");
+  }
 
   if (!universityId || typeof universityId !== "string") {
     throw new Error("Invalid university ID");

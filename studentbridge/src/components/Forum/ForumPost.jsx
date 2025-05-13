@@ -1,4 +1,3 @@
-// src/components/Forum/ForumPost.jsx
 import React, { useState, useEffect } from "react";
 import { votePost } from "../../services/forumServices";
 import { Link } from "react-router-dom";
@@ -8,12 +7,10 @@ export default function ForumPost({ post, universityId }) {
   const [votes, setVotes] = useState(post.votes || []);
   const [authorName, setAuthorName] = useState("");
 
-  // Fetch author name if not included in post
   useEffect(() => {
     if (post.authorName) {
       setAuthorName(post.authorName);
     } else {
-      // Fetch from backend
       getUserById(post.authorId)
         .then((user) => setAuthorName(user.name))
         .catch(() => setAuthorName("Unknown User"));

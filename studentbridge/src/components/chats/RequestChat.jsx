@@ -11,7 +11,6 @@ export default function RequestChat(props) {
     const senderId = props.senderId;
     const receipentId = props.receipentId;
 
-    // Perform the async operation outside the render cycle
     sendChatRequest(message, senderId, receipentId);
   };
 
@@ -22,6 +21,7 @@ export default function RequestChat(props) {
         senderId: senderId,
         receipentId: receipentId,
       })
+      // eslint-disable-next-line no-unused-vars
       .then((response) => {
         alert("Chat request sent successfully!");
         setMessage("");

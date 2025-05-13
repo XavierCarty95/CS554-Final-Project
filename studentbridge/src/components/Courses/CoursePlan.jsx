@@ -8,19 +8,16 @@ const CoursePlan = () => {
   const [selectedMajor, setSelectedMajor] = useState('');
   const [plan, setPlan] = useState(null);
 
-  // 🔄 Corrected path: relative URL to respect baseURL from axiosInstance
   useEffect(() => {
     axiosInstance.get('/universities').then((res) => {
-      console.log("✔️ Universities loaded:", res.data);
       setUniversities(res.data);
     });
   }, []);
 
-  // 🔄 Corrected path: relative URL to respect baseURL from axiosInstance
   useEffect(() => {
     if (selectedUniversity) {
       axiosInstance.get(`/universities/${selectedUniversity}`).then((res) => {
-        console.log("Selected university details:", res.data);
+     
         const requiredCourses = Array.isArray(res.data.requiredCourses) ? res.data.requiredCourses : [];
         const majorsSet = new Set();
         requiredCourses.forEach((course) => {
@@ -29,12 +26,11 @@ const CoursePlan = () => {
           }
         });
         setMajors([...majorsSet]);
-        console.log("Majors extracted:", [...majorsSet]);
+     
       });
     }
   }, [selectedUniversity]);
 
-  // 🔄 Corrected path: relative URL to respect baseURL from axiosInstance
   useEffect(() => {
     if (selectedUniversity && selectedMajor) {
       console.log("📤 Fetching plan for:", selectedUniversity, selectedMajor);
@@ -58,7 +54,7 @@ const CoursePlan = () => {
             className="w-full border rounded p-2"
             onChange={(e) => {
               setSelectedUniversity(e.target.value);
-              setSelectedMajor(""); // reset major when university changes
+              setSelectedMajor(""); 
             }}
           >
             <option value="">Select</option>

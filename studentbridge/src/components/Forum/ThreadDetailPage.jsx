@@ -1,4 +1,3 @@
-// src/components/Forum/ThreadDetailPage.jsx
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import {
@@ -16,7 +15,6 @@ export default function ThreadDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch forum details and posts
   useEffect(() => {
     if (!forumId || !universityId) {
       setError("Forum ID and University ID are required");
@@ -26,12 +24,10 @@ export default function ThreadDetailPage() {
 
     setIsLoading(true);
 
-    // Fetch forum details
     getForumById(forumId, universityId)
       .then((forumData) => {
         setForum(forumData);
 
-        // Fetch posts for this forum
         return getPosts(forumId);
       })
       .then((postsData) => {

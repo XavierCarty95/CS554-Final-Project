@@ -1,24 +1,54 @@
 import express from "express";
 import { ObjectId } from "mongodb";
-import { reviews } from "../config/mongoCollections.js";
-import { createReview, getReviewsByProfessorId } from "../data/reviews.js";
+import { reviews, users } from "../config/mongoCollections.js";
 
 const router = express.Router();
 
-// POST review (limit 2 per user per professor)
 router.post("/", async (req, res) => {
   try {
     const { professorId, userId, rating, comment } = req.body;
 
-    const existing = await getReviewsByProfessorId(professorId);
-    const userReviews = existing.filter(r => r.userId.toString() === userId);
-    if (userReviews.length >= 2) {
-      return res.status(400).json({ error: "You can only post up to 2 reviews." });
+    if (!professorId || !userId || !rating || !comment) {
+      return res.status(400).json({ error: "All fields are required" });
     }
 
-    const review = await createReview(professorId, userId, rating, comment);
-    res.status(201).json(review);
+    const reviewsCollection = await reviews();
+
+    // Check if user has already submitted 2 reviews for this professor
+    const existing = await reviewsCollection
+      .find({
+        professorId: professorId,
+        userId: userId,
+      })
+      .toArray();
+
+    if (existing.length >= 2) {
+      return res
+        .status(400)
+        .json({ error: "You can only post up to 2 reviews." });
+    }
+
+    const usersCollection = await users();
+    const user = await usersCollection.findOne({ _id: new ObjectId(userId) });
+    const userName = user?.name || "Unknown";
+
+    const newReview = {
+      professorId: professorId,
+      userId: userId,
+      userName: userName,
+      rating: Number(rating),
+      comment: comment.trim(),
+      createdAt: new Date(),
+    };
+
+    const result = await reviewsCollection.insertOne(newReview);
+
+    res.status(201).json({
+      _id: result.insertedId.toString(),
+      ...newReview,
+    });
   } catch (e) {
+    console.error("Error creating review:", e);
     res.status(400).json({ error: e.message });
   }
 });
@@ -26,32 +56,73 @@ router.post("/", async (req, res) => {
 // GET reviews by professor
 router.get("/:professorId", async (req, res) => {
   try {
-    const data = await getReviewsByProfessorId(req.params.professorId);
-    res.json(data);
+    const { professorId } = req.params;
+    const reviewsCollection = await reviews();
+
+    const professorReviews = await reviewsCollection
+      .find({ professorId: professorId })
+      .sort({ createdAt: -1 })
+      .toArray();
+
+    res.json(professorReviews);
   } catch (e) {
+    console.error("Error fetching reviews:", e);
     res.status(500).json({ error: "Could not fetch reviews" });
   }
 });
 
-// PUT update review
 router.put("/:reviewId", async (req, res) => {
   try {
+    const { reviewId } = req.params;
     const { rating, comment } = req.body;
-    const reviewCol = await reviews();
-    await reviewCol.updateOne({ _id: new ObjectId(req.params.reviewId) }, { $set: { rating, comment } });
+
+    if (!ObjectId.isValid(reviewId)) {
+      return res.status(400).json({ error: "Invalid review ID" });
+    }
+
+    const reviewsCollection = await reviews();
+    const result = await reviewsCollection.updateOne(
+      { _id: new ObjectId(reviewId) },
+      {
+        $set: {
+          rating: Number(rating),
+          comment: comment.trim(),
+          updatedAt: new Date(),
+        },
+      }
+    );
+
+    if (result.matchedCount === 0) {
+      return res.status(404).json({ error: "Review not found" });
+    }
+
     res.sendStatus(200);
   } catch (e) {
+    console.error("Error updating review:", e);
     res.status(400).json({ error: e.message });
   }
 });
 
-// DELETE review
 router.delete("/:reviewId", async (req, res) => {
   try {
-    const reviewCol = await reviews();
-    await reviewCol.deleteOne({ _id: new ObjectId(req.params.reviewId) });
+    const { reviewId } = req.params;
+
+    if (!ObjectId.isValid(reviewId)) {
+      return res.status(400).json({ error: "Invalid review ID" });
+    }
+
+    const reviewsCollection = await reviews();
+    const result = await reviewsCollection.deleteOne({
+      _id: new ObjectId(reviewId),
+    });
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ error: "Review not found" });
+    }
+
     res.sendStatus(200);
   } catch (e) {
+    console.error("Error deleting review:", e);
     res.status(400).json({ error: e.message });
   }
 });

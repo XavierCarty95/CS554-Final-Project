@@ -12,7 +12,6 @@ import { createUser } from "./data/users.js";
 
 async function main() {
   try {
-    // Get collection references
     const usersCollection = await users();
     const universitiesCollection = await universities();
     const forumsCollection = await forums();
@@ -29,7 +28,6 @@ async function main() {
     await professorsCollection.deleteMany({});
     await reviewsCollection.deleteMany({});
 
-    // Create university
     console.log("Creating university...");
     const universityInfo = {
       name: "State University",
@@ -45,7 +43,6 @@ async function main() {
     const universityId = universityInsert.insertedId;
     console.log(`Added university: ${universityInfo.name}`);
 
-    // Add professors
     console.log("Adding professors...");
     const professorData = [
       {
@@ -76,14 +73,12 @@ async function main() {
       console.log(`Added professor: ${prof.name}`);
     }
 
-    // Update university with professor IDs
     await universitiesCollection.updateOne(
       { _id: universityId },
       { $set: { professors: professorIds } }
     );
     console.log(" University updated with professor references.");
 
-    // Add reviews for professors
     console.log("Adding reviews...");
     const reviewData = [
       {
