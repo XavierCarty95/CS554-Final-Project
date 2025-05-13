@@ -25,6 +25,8 @@ import CourseDetail from "./components/Courses/CourseDetail";
 import AddCourse from "./components/Courses/AddCourse";
 import CoursePlan from "./components/Courses/CoursePlan";
 import UniversityCourses from "./components/University/UniversityCourses.jsx";
+import GroupList from "./components/groups/GroupList.jsx";
+import GroupPage from "./components/groups/GroupPage.jsx";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -312,6 +314,30 @@ function App() {
               setCurrentUser={setCurrentUser}
             >
               <UniversityCourses />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/university/:universityId/groups"
+          element={
+            <ProtectedRoute
+              isLoggedIn={isLoggedIn}
+              setIsLoggedIn={setIsLoggedIn}
+              setCurrentUser={setCurrentUser}
+            >
+              <GroupList />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/university/:universityId/groups/:groupId"
+          element={
+            <ProtectedRoute
+              isLoggedIn={isLoggedIn}
+              setIsLoggedIn={setIsLoggedIn}
+              setCurrentUser={setCurrentUser}
+            >
+              <GroupPage />
             </ProtectedRoute>
           }
         />
