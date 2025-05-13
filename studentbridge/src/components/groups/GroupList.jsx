@@ -120,21 +120,26 @@ const GroupList = () => {
   };
 
   return (
-    <div className="p-6">
+    <div className="p-8 max-w-4xl mx-auto">
       {isStudent ? (
-        <div>
-          <h1 className="text-2xl font-bold mb-4">
-            Welcome to the Student Group List
-          </h1>
-          <button
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
-            onClick={() => setShowAddGroup(!showAddGroup)}
-          >
-            Post a new group
-          </button>
+        <>
+          <header className="mb-8">
+            <h1 className="text-3xl font-extrabold mb-2 text-blue-800">
+              Student Groups
+            </h1>
+            <button
+              className="bg-blue-600 text-white px-6 py-2 rounded-lg shadow hover:bg-blue-700 transition"
+              onClick={() => setShowAddGroup(!showAddGroup)}
+            >
+              {showAddGroup ? "Cancel" : "Post a New Group"}
+            </button>
+          </header>
+
           {showAddGroup && (
-            <div className="mt-6 p-4 border rounded shadow-md bg-gray-50">
-              <h2 className="text-xl font-semibold mb-4">Create a new group</h2>
+            <section className="mb-8 bg-white p-6 rounded-lg shadow border">
+              <h2 className="text-xl font-semibold mb-4 text-gray-800">
+                Create a New Group
+              </h2>
               <form className="space-y-4" onSubmit={handlePostGroup}>
                 <input
                   type="text"
@@ -142,123 +147,107 @@ const GroupList = () => {
                   name="groupName"
                   id="groupName"
                   required
-                  className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
                 <textarea
                   placeholder="Group Description"
                   name="description"
                   id="description"
                   required
-                  className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  rows={3}
                 ></textarea>
                 <button
                   type="submit"
-                  className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition"
+                  className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition"
                 >
                   Post Group
                 </button>
               </form>
-            </div>
+            </section>
           )}
 
-          <h2 className="text-xl font-semibold mt-6 mb-4">My Groups</h2>
-          <div>
-            <div>
-              {myGroups.length > 0 ? (
-                <ul className="space-y-4">
-                  {myGroups.map((group) => (
+          <section className="mb-8">
+            <h2 className="text-xl font-bold mb-4 text-blue-700">My Groups</h2>
+            {myGroups.length > 0 ? (
+              <ul className="grid gap-4 md:grid-cols-2">
+                {myGroups.map((group) => (
+                  <li key={group._id}>
                     <Link
                       to={`/university/${universityId}/groups/${group._id}`}
+                      className="block bg-white p-5 rounded-lg shadow hover:shadow-lg border hover:border-blue-400 transition"
                     >
-                      <li
-                        key={group._id}
-                        className="p-4 border rounded shadow-md"
-                      >
-                        <h3 className="text-lg font-semibold">
-                          {group.groupName}
-                        </h3>
-                        <p className="text-gray-600">{group.description}</p>
-                      </li>
-                    </Link>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-gray-500">
-                  You have not created any groups yet.
-                </p>
-              )}
-            </div>
-
-            <h2 className="text-xl font-semibold mt-6 mb-4">Joined Groups</h2>
-            <div>
-              {joinedGroups.length > 0 ? (
-                <ul className="space-y-4">
-                  {joinedGroups.map((group) => (
-                    <Link
-                      to={`/university/${universityId}/groups/${group._id}`}
-                    >
-                      <li
-                        key={group._id}
-                        className="p-4 border rounded shadow-md"
-                      >
-                        <h3 className="text-lg font-semibold">
-                          {group.groupName}
-                        </h3>
-                        <p className="text-gray-600">{group.description}</p>
-                      </li>
-                    </Link>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-gray-500">
-                  You have not joined any groups yet.
-                </p>
-              )}
-            </div>
-
-            <h2 className="text-xl font-semibold mt-6 mb-4">
-              Available Groups
-            </h2>
-            <div>
-              {groupsList.length > 0 ? (
-                <ul className="space-y-4">
-                  {groupsList.map((group) => (
-                    <li
-                      key={group._id}
-                      className="p-4 border rounded shadow-md"
-                    >
-                      <h3 className="text-lg font-semibold">
+                      <h3 className="text-lg font-semibold text-gray-900">
                         {group.groupName}
                       </h3>
-                      <p className="text-gray-600">{group.description}</p>
-                      <button
-                        className="mt-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
-                        onClick={() => {
-                          handleJoinGroup(group._id);
-                          setGroupsList((prevGroups) =>
-                            prevGroups.filter((g) => g._id !== group._id)
-                          );
-                        }}
-                      >
-                        Join Group
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-gray-500">No groups available to join.</p>
-              )}
-            </div>
-          </div>
-        </div>
+                      <p className="text-gray-600 mt-1">{group.description}</p>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-gray-500">You have not created any groups yet.</p>
+            )}
+          </section>
+
+          <section className="mb-8">
+            <h2 className="text-xl font-bold mb-4 text-blue-700">Joined Groups</h2>
+            {joinedGroups.length > 0 ? (
+              <ul className="grid gap-4 md:grid-cols-2">
+                {joinedGroups.map((group) => (
+                  <li key={group._id}>
+                    <Link
+                      to={`/university/${universityId}/groups/${group._id}`}
+                      className="block bg-white p-5 rounded-lg shadow hover:shadow-lg border hover:border-blue-400 transition"
+                    >
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        {group.groupName}
+                      </h3>
+                      <p className="text-gray-600 mt-1">{group.description}</p>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-gray-500">You have not joined any groups yet.</p>
+            )}
+          </section>
+
+          <section>
+            <h2 className="text-xl font-bold mb-4 text-blue-700">Available Groups</h2>
+            {groupsList.length > 0 ? (
+              <ul className="grid gap-4 md:grid-cols-2">
+                {groupsList.map((group) => (
+                  <li
+                    key={group._id}
+                    className="bg-white p-5 rounded-lg shadow border hover:border-blue-400 transition"
+                  >
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      {group.groupName}
+                    </h3>
+                    <p className="text-gray-600 mt-1">{group.description}</p>
+                    <button
+                      className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+                      onClick={() => handleJoinGroup(group._id)}
+                    >
+                      Join Group
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-gray-500">No groups available to join.</p>
+            )}
+          </section>
+        </>
       ) : (
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">
+        <div className="flex flex-col items-center justify-center min-h-[300px]">
+          <h1 className="text-2xl font-bold mb-4 text-red-600">
             You are not a student at this university.
           </h1>
           <Link
             to={`/universities/${universityId}`}
-            className="text-blue-500 underline hover:text-blue-700"
+            className="text-blue-600 underline hover:text-blue-800"
           >
             Go Back
           </Link>

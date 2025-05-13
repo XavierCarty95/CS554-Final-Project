@@ -15,6 +15,8 @@ export default function Chats() {
   });
   const [chats, setChats] = useState({});
   const chatRefs = useRef({});
+  const [groupChatsList, setGroupChatsList] = useState([]);
+  const [userId, setUserId] = useState(null);
 
   const fetchChatRequests = async () => {
     try {
@@ -41,13 +43,34 @@ export default function Chats() {
     }
   };
 
+
+  const fetchGroupChats = async () => {
+    try {
+      const response = await axiosInstance.get("/chat/listGroupChats");
+      if (response.status === 200) {
+        setGroupChatsList(response.data);
+        if (response.data.length > 0) {
+          setState({ message: "", name: response.data[0].senderName });
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching group chats:", error);
+    } 
+  };
+
   const handleTabChange = (index) => {
     setActiveTab(index);
     if (index === 2) fetchChatRequests();
     if (index === 0) fetchPersonalChats();
+    if (index === 1) fetchGroupChats();
   };
 
   const handleChatSelect = (chat) => {
+    if (chat.type === "group") {
+      fetchGroupChats();
+    } else if (chat.type === "personal") {
+      fetchPersonalChats();
+    }
     setChats((prevChats) => ({ ...prevChats, [chat._id]: chat.messages }));
     setSelectedChat(chat);
     if (!chatRefs.current[chat._id]) {
@@ -175,7 +198,23 @@ export default function Chats() {
           )}
 
           {activeTab === 1 && (
-            <div className="text-center text-gray-500 py-4">Groups Content</div>
+            <div className="overflow-y-auto max-h-full">
+              {groupChatsList.length > 0 ? (
+                groupChatsList.map((chat) => (
+                  <div
+                    key={chat._id}
+                    className="border-b p-4 flex justify-between items-center hover:bg-gray-100 cursor-pointer"
+                    onClick={() => handleChatSelect(chat)}
+                  >
+                    <strong>{chat.name || "Unknown Group"}</strong>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center text-gray-500 py-4">
+                  No group chats available.
+                </div>
+              )}
+            </div>
           )}
 
           {activeTab === 2 && (

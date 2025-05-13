@@ -9,6 +9,7 @@ import {
   listPersonalChats,
   getPublicChat,
   isChatExists,
+  fetchGroupChat,
 } from "../data/chats.js";
 const router = express.Router();
 
@@ -87,6 +88,16 @@ router.post("/chatexists", ensureAuthenticated, async (req, res) => {
   try {
     const chatExists = await isChatExists(senderId, receipentId);
     return res.status(200).json(chatExists);
+  } catch (e) {
+    return res.status(400).json({ error: e.message });
+  }
+});
+
+router.get("/listGroupChats", ensureAuthenticated, async (req, res) => {
+  const userId = req.session.user._id;
+  try {
+    const groupChats = await fetchGroupChat(userId);
+    return res.status(200).json(groupChats);
   } catch (e) {
     return res.status(400).json({ error: e.message });
   }
