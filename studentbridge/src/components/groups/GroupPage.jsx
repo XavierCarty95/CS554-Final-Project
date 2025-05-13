@@ -42,7 +42,7 @@ const GroupPage = () => {
     };
 
     fetchGroupDetails();
-  }, [groupId, universityId, meets]);
+  }, [groupId, universityId]);
 
   const handleLeaveGroup = async () => {
     try {
