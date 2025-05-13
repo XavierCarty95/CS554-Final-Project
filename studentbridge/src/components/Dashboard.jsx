@@ -31,8 +31,8 @@ function Dashboard() {
             <p className="text-gray-600 mb-4">
               Find professors and read their reviews
             </p>
-            <p className="text-blue-600">
-              Select a university to view professors →
+            <p className="text-black-600">
+              Select a university to view professors
             </p>
           </div>
 
