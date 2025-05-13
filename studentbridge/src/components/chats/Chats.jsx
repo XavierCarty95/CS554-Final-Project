@@ -16,6 +16,7 @@ export default function Chats() {
   const [chats, setChats] = useState({});
   const chatRefs = useRef({});
   const [groupChatsList, setGroupChatsList] = useState([]);
+  // eslint-disable-next-line no-unused-vars
   const [userId, setUserId] = useState(null);
 
   const fetchChatRequests = async () => {

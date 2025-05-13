@@ -9,23 +9,23 @@ import { isValidId } from "../helpers.js";
 
 router.post("/schedule-meeting", async (req, res) => {
   const { date, emails, meetingLink, message } = req.body;
-  //   const transporter = nodemailer.createTransport({
-  //     service: process.env.SMTP_SERVICE,
-  //     auth: {
-  //       user: process.env.SMTP_USER,
-  //       pass: process.env.SMTP_PASS,
-  //     },
-  //   });
-
-  let testAccount = await nodemailer.createTestAccount();
   const transporter = nodemailer.createTransport({
-    host: "smtp.ethereal.email",
-    port: 587,
+    service: process.env.SMTP_SERVICE,
     auth: {
-      user: testAccount.user,
-      pass: testAccount.pass,
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
     },
   });
+
+  // let testAccount = await nodemailer.createTestAccount();
+  // const transporter = nodemailer.createTransport({
+  //   host: "smtp.ethereal.email",
+  //   port: 587,
+  //   auth: {
+  //     user: testAccount.user,
+  //     pass: testAccount.pass,
+  //   },
+  // });
 
   transporter.verify(function (error, success) {
     if (error) {
