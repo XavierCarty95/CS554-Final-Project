@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { votePost } from "../../services/forumServices";
 import { Link } from "react-router-dom";
-import { getUserById } from "../../services/userServices"; // You should have this
+import { getUserById } from "../../services/userServices";
 import Footer from "../Footer";
 
 export default function ForumPost({ post, universityId }) {
@@ -21,7 +21,8 @@ export default function ForumPost({ post, universityId }) {
   const handleVote = async (voteType) => {
     try {
       const updatedPost = await votePost(post._id, voteType, universityId);
-      setVotes(updatedPost.votes);
+      // Update votes state with the latest votes from the server
+      setVotes(updatedPost.votes || []);
     } catch (err) {
       console.error("Error voting:", err);
       alert("You can only vote once per post.");
@@ -70,7 +71,6 @@ export default function ForumPost({ post, universityId }) {
           </div>
         </div>
       </div>
-    
     </>
   );
 }
