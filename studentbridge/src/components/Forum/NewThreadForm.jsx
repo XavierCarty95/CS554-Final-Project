@@ -29,7 +29,9 @@ export default function NewThreadForm({ onSubmit }) {
     e.preventDefault();
     if (!title.trim()) return;
 
+
     onSubmit(title, selectedTags);
+
     setTitle("");
     setSelectedTags([]);
     setSearchTerm("");
