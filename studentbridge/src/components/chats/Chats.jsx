@@ -75,7 +75,7 @@ export default function Chats() {
     setChats((prevChats) => ({ ...prevChats, [chat._id]: chat.messages }));
     setSelectedChat(chat);
     if (!chatRefs.current[chat._id]) {
-      const socket = io("http://localhost:3000");
+      const socket = io(import.meta.env.VITE_WS_URL || "http://localhost:3000");
       chatRefs.current[chat._id] = socket;
 
       socket.on("chatMessage", ({ name, message, chatId }) => {

@@ -13,7 +13,7 @@ const GroupPage = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [meetingLink, setMeetingLink] = useState("");
   const [message, setMessage] = useState("");
-  const [meets, setMeets] = useState(false);
+  const [meets, setMeets] = useState([]);
 
   useEffect(() => {
     const fetchGroupDetails = async () => {

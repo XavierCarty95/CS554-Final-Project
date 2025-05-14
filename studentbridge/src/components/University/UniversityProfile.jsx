@@ -57,7 +57,9 @@ const UniversityProfile = () => {
   }, [universityId]);
 
   useEffect(() => {
-    socketRef.current = io("http://localhost:3000");
+    socketRef.current = io(
+      import.meta.env.VITE_WS_URL || "http://localhost:3000"
+    );
 
     socketRef.current.emit("user_join", publicChatId);
 
