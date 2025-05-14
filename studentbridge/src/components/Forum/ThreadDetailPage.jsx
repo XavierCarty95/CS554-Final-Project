@@ -52,7 +52,16 @@ export default function ThreadDetailPage() {
         universityId,
       });
 
-      setPosts((prev) => [...prev, newPost]);
+      // Ensure the new post has necessary fields for rendering
+      const enrichedPost = {
+        ...newPost,
+        createdAt: newPost.createdAt || new Date().toISOString(),
+        authorName: newPost.authorName || "Current User", // Replace with actual user name if available
+        authorId: newPost.authorId || "currentUserId", // Replace with actual user ID if available
+      };
+
+      // Update posts state with the enriched post
+      setPosts((prev) => [...prev, enrichedPost]);
       setNewReply("");
     } catch (err) {
       console.error("Error posting reply:", err);
@@ -91,7 +100,6 @@ export default function ThreadDetailPage() {
         </Link>
       </div>
 
-      {/* Thread title and metadata */}
       <div className="border-b pb-4 mb-6">
         <h2 className="text-2xl font-bold">{forum.title}</h2>
         <div className="flex flex-wrap gap-2 mt-2">
@@ -123,7 +131,6 @@ export default function ThreadDetailPage() {
         )}
       </div>
 
-      {/* Reply form */}
       <div className="mt-6">
         <form onSubmit={handleNewReply}>
           <textarea
